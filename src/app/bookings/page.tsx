@@ -1,0 +1,3 @@
+import { LocalBookings } from "@/components/local-bookings"; import { pageMetadata } from "@/lib/metadata";
+export const metadata = pageMetadata("Viewing requests", "Viewing requests saved locally in this browser.", "/bookings", true);
+export default function Page() { return <section className="section"><div className="container"><span className="eyebrow">Local history</span><h1>Your viewing requests</h1><p className="muted">This browser stores a minimal record after successful submission. It is not cross-device history and does not expose server-side booking access.</p><LocalBookings /></div></section>; }

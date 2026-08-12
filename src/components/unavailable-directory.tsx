@@ -1,0 +1,2 @@
+import Link from "next/link";
+export function UnavailableDirectory({ kind }: { kind: "agents" | "agency" }) { return <div className="card state"><div><h2>Public {kind} profiles are not available yet</h2><p className="muted">Homes displays real representative details on individual published properties. A public directory will appear when the backend exposes verified public profile endpoints.</p><Link className="button" href="/discover">Browse properties</Link></div></div>; }
