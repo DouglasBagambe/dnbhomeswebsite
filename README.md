@@ -18,10 +18,10 @@ npm run dev
 cd "/home/dnb/Work/dnb Homes/dnbhomeswebsite"
 cp .env.example .env.local
 # Set NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1
-npm run dev -- --port 3001
+npm run dev
 ```
 
-The demo seed is development-only, deterministic and idempotent. It upserts exactly 50 illustrative records marked with the `demo:homes-v1` tag; it refuses to run with `NODE_ENV=production`. Photos are deterministic Unsplash development imagery and do not claim to depict the demo properties. Production never assumes localhost.
+From the workspace root, `./scripts/dev-homes.sh --seed` performs the same startup with explicit demo seeding. The seed is development-only, deterministic and idempotent. It upserts exactly 50 illustrative records marked with `demo:homes-v1`; both seeding and cleanup refuse production. Demo photos are committed local development assets, so local visual QA does not depend on internet access. Production never assumes localhost.
 
 ## Commands
 
@@ -49,17 +49,9 @@ Optional:
 - `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` — reserved for consent-aware adapters.
 - `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_CONTACT_PHONE` — enables real contact actions.
 
-## Backend gaps
+## Functional scope
 
-Published property search/detail and viewing requests use the current V1 backend. Public representative directories require these additions before the prepared routes can display data:
-
-- `GET /api/v1/agents` with public pagination/filtering
-- `GET /api/v1/agents/:idOrSlug` with active published listings
-- `GET /api/v1/agencies/:idOrSlug` with active published listings
-- Optional `POST /api/v1/contact` for direct contact-form delivery
-- Authenticated or guest-token booking retrieval before cross-device request history can be offered
-
-The current site does not fake these capabilities.
+Published discovery/detail, viewing requests, public agent and agency directories, contact messages, and property-onboarding leads use the V1 backend. Saved homes, comparison, and the guest viewing-request history are intentionally device-local; the UI says so and does not imply account sync.
 
 ## Deployment
 

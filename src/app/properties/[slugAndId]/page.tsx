@@ -12,6 +12,7 @@ import { getProperties, getProperty } from "@/lib/api";
 import { config } from "@/lib/config";
 import { formatPrice, idFromSlugAndId, locationLabel, propertyPath, titleCase } from "@/lib/format";
 import { propertyMetadata } from "@/lib/metadata";
+import { bypassImageOptimization } from "@/lib/storage";
 
 type Params = Promise<{ slugAndId: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> { try { return propertyMetadata(await getProperty(idFromSlugAndId((await params).slugAndId))); } catch { return { title: "Property unavailable", robots: { index: false } }; } }
@@ -24,8 +25,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const similar = await getProperties({ type: property.type, area: property.location.area || undefined, limit: 4 }).catch(() => null);
   const canonical = `${config.siteUrl}${propertyPath(property)}`;
   const facts = [
-    [BedDouble, property.bedrooms !== undefined ? `${property.bedrooms} bedrooms` : undefined],
-    [Bath, property.bathrooms !== undefined ? `${property.bathrooms} bathrooms` : undefined],
+    [BedDouble, property.bedrooms ? `${property.bedrooms} bedrooms` : undefined],
+    [Bath, property.bathrooms ? `${property.bathrooms} bathrooms` : undefined],
     [Building2, titleCase(property.type)],
     [Maximize2, property.size ? `${property.size} ${property.sizeUnit}` : undefined],
   ] as const;
@@ -36,7 +37,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
     <section className="section-tight property-detail"><div className="container">
       <nav aria-label="Breadcrumb" className="detail-breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/discover">Discover</Link><span>/</span><span>{property.location.area || property.title}</span></nav>
       <div className="detail-heading"><div>{property.verificationStatus === "verified" && <span className="verified-mark"><ShieldCheck size={16} /> Verified listing</span>}<h1>{property.title}</h1><p><MapPin size={16} /> {locationLabel(property) || property.location.address}</p></div><div className="detail-actions"><div className="detail-favorite"><FavoriteButton id={property._id} /></div><ShareButton url={canonical} title={property.title} /></div></div>
-      <div className={`detail-gallery gallery-${gallery.length}`}>{gallery.length ? gallery.map((media, index) => <div key={media.url}><Image src={media.url} alt={media.alt || `${property.title} image ${index + 1}`} fill priority={index === 0} unoptimized={media.url.includes("images.unsplash.com")} sizes={index === 0 ? "(max-width: 760px) 100vw, 66vw" : "33vw"} /></div>) : <div className="image-placeholder">Homes property</div>}</div>
+      <div className={`detail-gallery gallery-${gallery.length}`}>{gallery.length ? gallery.map((media, index) => <div key={media.url}><Image src={media.url} alt={media.alt || `${property.title} image ${index + 1}`} fill priority={index === 0} unoptimized={bypassImageOptimization(media.url)} sizes={index === 0 ? "(max-width: 760px) 100vw, 66vw" : "33vw"} /></div>) : <div className="image-placeholder">Homes property</div>}</div>
       <div className="detail-layout"><article className="detail-copy">
         <div className="detail-price-mobile">{formatPrice(property.price)}</div>
         <div className="fact-row">{facts.filter(([,value]) => value).map(([Icon, value]) => <div className="fact-box" key={String(value)}><Icon size={20} /><strong>{value}</strong></div>)}</div>

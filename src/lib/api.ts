@@ -1,6 +1,6 @@
 import { config } from "@/lib/config";
 import { toSearchParams, type ListingQuery } from "@/lib/query";
-import type { Booking, Property, PropertyPage } from "@/types/property";
+import type { Agency, Agent, Booking, DirectoryPage, Property, PropertyPage } from "@/types/property";
 
 export class ApiError extends Error {
   constructor(message: string, public readonly status?: number) {
@@ -45,4 +45,20 @@ export async function submitBooking(
     body: JSON.stringify(body),
   });
   return result.data;
+}
+
+export const getAgents = (): Promise<DirectoryPage<Agent>> => request<DirectoryPage<Agent>>("/agents?limit=50");
+export const getAgencies = (): Promise<DirectoryPage<Agency>> => request<DirectoryPage<Agency>>("/agencies?limit=50");
+export async function getAgent(idOrSlug: string): Promise<Agent> {
+  return (await request<{ data: Agent }>(`/agents/${encodeURIComponent(idOrSlug)}`)).data;
+}
+export async function getAgency(idOrSlug: string): Promise<Agency> {
+  return (await request<{ data: Agency }>(`/agencies/${encodeURIComponent(idOrSlug)}`)).data;
+}
+export async function submitInquiry(path: "/contact" | "/listing-inquiries", body: Record<string, string>) {
+  return request<{ data: { id: string }; message: string }>(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 }

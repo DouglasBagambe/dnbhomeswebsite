@@ -5,11 +5,11 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   timeout: 60_000,
-  use: { baseURL: "http://127.0.0.1:3000", trace: "on-first-retry", navigationTimeout: 20_000 },
+  use: { baseURL: "http://127.0.0.1:3001", trace: "on-first-retry", navigationTimeout: 20_000 },
   webServer: {
-    command: "npm start",
+    command: "npm start -- -p 3001",
     env: { HOMES_E2E: "1", NEXT_PUBLIC_API_BASE_URL: "http://127.0.0.1:9/api/v1" },
-    url: "http://127.0.0.1:3000",
+    url: "http://127.0.0.1:3001",
     reuseExistingServer: true,
   },
   projects: [

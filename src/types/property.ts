@@ -26,6 +26,10 @@ export interface Agency {
   email?: string;
   website?: string;
   verificationStatus?: string;
+  description?: string;
+  listingCount?: number;
+  listings?: Property[];
+  agents?: Agent[];
 }
 
 export interface Agent {
@@ -38,6 +42,8 @@ export interface Agent {
   photo?: string;
   verificationStatus?: string;
   agency?: Agency;
+  listingCount?: number;
+  listings?: Property[];
 }
 
 export interface Property {
@@ -85,4 +91,9 @@ export interface Booking {
   scheduledAt: string;
   status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected" | "no_show";
   createdAt: string;
+}
+
+export interface DirectoryPage<T> {
+  data: T[];
+  pagination: { page: number; limit: number; total: number; pages: number };
 }

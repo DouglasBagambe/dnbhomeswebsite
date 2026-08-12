@@ -30,3 +30,6 @@ export interface LocalBooking {
 export function imageFor(property: Property): string | undefined {
   return property.cover?.url || property.media.find((media) => media.type === "image")?.url;
 }
+
+export const bypassImageOptimization = (url: string): boolean =>
+  url.includes("images.unsplash.com") || /^http:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(url);
