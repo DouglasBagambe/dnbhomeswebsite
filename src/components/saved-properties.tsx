@@ -6,6 +6,7 @@ import { PropertyCard } from "@/components/property-card";
 import { FAVORITES_KEY, readIds } from "@/lib/storage";
 import { config } from "@/lib/config";
 import type { Property } from "@/types/property";
+import { Heart } from "lucide-react";
 
 export function SavedProperties() {
   const [state, setState] = useState<{ loading: boolean; properties: Property[]; failed?: boolean }>({ loading: true, properties: [] });
@@ -22,7 +23,7 @@ export function SavedProperties() {
     const listener = () => void load(); window.addEventListener("homes:favorites", listener); return () => window.removeEventListener("homes:favorites", listener);
   }, []);
   if (state.loading) return <p className="muted">Loading saved properties…</p>;
-  if (state.failed) return <div className="card state error"><div><h2>Saved properties are unavailable</h2><p>Check your connection and try again.</p></div></div>;
-  if (!state.properties.length) return <div className="card state"><div><h2>No saved properties</h2><p className="muted">Use the heart on a property to save it in this browser.</p><Link className="button" href="/discover">Discover properties</Link></div></div>;
+  if (state.failed) return <div className="state error"><div><h2>Saved homes are unavailable</h2><p>Check your connection and try again.</p></div></div>;
+  if (!state.properties.length) return <div className="state"><div><Heart size={28} /><h2>No saved homes</h2><p className="muted">Save homes you want to come back to.</p><Link className="button" href="/discover">Browse homes</Link></div></div>;
   return <div className="property-grid">{state.properties.map((property) => <PropertyCard key={property._id} property={property} />)}</div>;
 }

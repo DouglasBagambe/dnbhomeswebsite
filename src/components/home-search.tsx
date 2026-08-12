@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import { RECENT_SEARCHES_KEY } from "@/lib/storage";
 
 export function HomeSearch() {
@@ -25,13 +26,12 @@ export function HomeSearch() {
     router.push(`/discover?${params}`);
   };
   return <div className="search-shell container"><div className="search-box">
-    <div className="search-tabs" role="tablist" aria-label="Property purpose">{[["rent", "Rent"], ["sale", "Buy"], ["short_stay", "Short Stay"]].map(([value, label]) => <button key={value} className={`search-tab ${purpose === value ? "active" : ""}`} onClick={() => setPurpose(value)} role="tab" aria-selected={purpose === value}>{label}</button>)}</div>
     <form action={submit} className="search-grid">
-      <div className="field"><label htmlFor="home-location">Location or keyword</label><input id="home-location" name="q" placeholder="Try Ntinda, Kampala or house" /></div>
+      <div className="search-field search-location"><label htmlFor="home-location">Location</label><input id="home-location" name="q" placeholder="Area, city or property" /></div>
+      <div className="search-field"><label htmlFor="home-purpose">Purpose</label><select id="home-purpose" value={purpose} onChange={(event) => setPurpose(event.target.value)}><option value="rent">Rent</option><option value="sale">Buy</option><option value="short_stay">Short Stay</option></select></div>
       <div className="field"><label htmlFor="home-type">Property type</label><select id="home-type" name="type" defaultValue=""><option value="">Any type</option><option value="house">House</option><option value="apartment">Apartment</option><option value="land">Land</option><option value="commercial">Commercial</option><option value="serviced_apartment">Serviced apartment</option></select></div>
-      <div className="field"><label htmlFor="home-budget">Maximum budget</label><input id="home-budget" name="maxPrice" inputMode="numeric" placeholder="UGX" /></div>
-      <div className="field"><label htmlFor="home-beds">Bedrooms</label><select id="home-beds" name="bedrooms" defaultValue=""><option value="">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
-      <button className="button" type="submit">Search Homes</button>
+      <div className="search-field"><label htmlFor="home-budget">Budget</label><input id="home-budget" name="maxPrice" inputMode="numeric" placeholder="Any budget" /></div>
+      <button className="button search-submit" type="submit"><Search size={20} /><span>Search Homes</span></button>
     </form>
   </div></div>;
 }

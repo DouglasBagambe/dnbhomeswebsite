@@ -1,0 +1,6 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#FAF9F6"/>
+  <image href="dnb-mark-light.svg" x="420" y="145" width="180" height="180"/>
+  <text x="590" y="270" fill="#101814" font-family="Inter,Arial,sans-serif" font-size="96" font-weight="600">Homes</text>
+  <text x="600" y="380" text-anchor="middle" fill="#64706A" font-family="Inter,Arial,sans-serif" font-size="32">Property discovery in Uganda</text>
+</svg>

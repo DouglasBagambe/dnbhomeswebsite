@@ -6,13 +6,22 @@ Production-quality Next.js consumer property platform for **Homes**, operated by
 
 Requirements: Node.js 20.9+ and npm.
 
+Run the API first, then the website on a separate port:
+
 ```bash
-cp .env.example .env.local
-npm install
+cd "/home/dnb/Work/dnb Homes/dnbhomesbackend"
+cp .env.example .env
+# Replace the development JWT placeholders and ensure MongoDB is running.
+npm run seed:demo
 npm run dev
+
+cd "/home/dnb/Work/dnb Homes/dnbhomeswebsite"
+cp .env.example .env.local
+# Set NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1
+npm run dev -- --port 3001
 ```
 
-The default API is `https://api.dnbhomes.com/api/v1`. For a local backend, set `NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1` explicitly. Production never assumes localhost.
+The demo seed is development-only, deterministic and idempotent. It upserts exactly 50 illustrative records marked with the `demo:homes-v1` tag; it refuses to run with `NODE_ENV=production`. Photos are deterministic Unsplash development imagery and do not claim to depict the demo properties. Production never assumes localhost.
 
 ## Commands
 

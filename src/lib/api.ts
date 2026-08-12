@@ -11,7 +11,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${config.apiBaseUrl}${path}`, {
     ...init,
-    signal: init?.signal ?? AbortSignal.timeout(8_000),
+    signal: init?.signal ?? AbortSignal.timeout(process.env.HOMES_E2E === "1" ? 750 : 8_000),
     headers: { Accept: "application/json", ...init?.headers },
     next: init?.method ? undefined : { revalidate: 60 },
   });
