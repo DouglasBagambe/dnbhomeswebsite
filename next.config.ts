@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
     ],
   },
   poweredByHeader: false,
+  async redirects() {
+    return [{ source: "/list-property", destination: "/contact", permanent: true }];
+  },
 };
 
 export default nextConfig;

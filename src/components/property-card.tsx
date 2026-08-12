@@ -19,8 +19,8 @@ export function PropertyCard({ property, compact = false }: { property: Property
     <div className="property-body">
       <div className="property-price-row"><span className="price">{formatPrice(property.price)}</span>{property.verificationStatus === "verified" && <span className="verified-mark" title="Verified listing"><BadgeCheck size={17} /> Verified</span>}</div>
       <h3><Link href={propertyPath(property)}>{property.title}</Link></h3>
-      {facts && <div className="facts">{facts}</div>}
       <div className="property-location">{locationLabel(property)}</div>
+      {facts && <div className="facts">{facts}</div>}
       <CompareButton property={property} />
     </div>
   </article>;
