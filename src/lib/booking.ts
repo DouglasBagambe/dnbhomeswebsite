@@ -13,7 +13,8 @@ export const bookingSchema = z.object({
 
 export type BookingInput = z.infer<typeof bookingSchema>;
 export function toBookingPayload(input: BookingInput): Record<string, string> {
-  const scheduledAt = new Date(`${input.date}T${input.time}:00`);
+  // Viewings take place in Uganda (UTC+03:00), regardless of the host timezone.
+  const scheduledAt = new Date(`${input.date}T${input.time}:00+03:00`);
   if (Number.isNaN(scheduledAt.valueOf()) || scheduledAt <= new Date()) throw new Error("Choose a future date and time");
   return { property: input.property, guestName: input.guestName, guestEmail: input.guestEmail, guestPhone: input.guestPhone, scheduledAt: scheduledAt.toISOString(), notes: input.notes };
 }

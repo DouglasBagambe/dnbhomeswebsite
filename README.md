@@ -35,6 +35,8 @@ npx playwright test
 
 Playwright browser binaries are intentionally not installed by `npm install`; install Chromium separately only when E2E execution is required.
 
+Viewing dates and times use Uganda time (UTC+03:00), independent of the server timezone.
+
 ## Environment
 
 See `.env.example`. Required in production:
