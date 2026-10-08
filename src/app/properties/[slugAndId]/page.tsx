@@ -8,7 +8,7 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { PropertyGrid } from "@/components/property-grid";
 import { ShareButton } from "@/components/share-button";
 import { ViewingForm } from "@/components/viewing-form";
-import { getProperties, getProperty } from "@/lib/api";
+import { ApiError, getProperties, getProperty } from "@/lib/api";
 import { config } from "@/lib/config";
 import { formatPrice, idFromSlugAndId, locationLabel, propertyPath, titleCase } from "@/lib/format";
 import { propertyMetadata } from "@/lib/metadata";
@@ -18,7 +18,7 @@ type Params = Promise<{ slugAndId: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> { try { return propertyMetadata(await getProperty(idFromSlugAndId((await params).slugAndId))); } catch { return { title: "Property unavailable", robots: { index: false } }; } }
 
 export default async function PropertyPage({ params }: { params: Params }) {
-  let property; try { property = await getProperty(idFromSlugAndId((await params).slugAndId)); } catch { notFound(); }
+  let property; try { property = await getProperty(idFromSlugAndId((await params).slugAndId)); } catch (error) { if (error instanceof ApiError && error.status === 404) notFound(); throw error; }
   const images = property.media.filter((media) => media.type === "image" && media.url).slice(0, 5);
   if (property.cover?.url && !images.some((item) => item.url === property.cover?.url)) images.unshift(property.cover);
   const gallery = images.slice(0, 5);

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PropertyGrid } from "@/components/property-grid";
-import { EmptyState } from "@/components/states";
+import { EmptyState, ErrorState } from "@/components/states";
 import { getProperties } from "@/lib/api";
 import { config } from "@/lib/config";
 import { titleCase } from "@/lib/format";
@@ -39,5 +39,5 @@ export default async function Page({ params }: { params: Params }) {
   const location = values.at(-1) ?? "Uganda";
   const result = await getProperties({ ...locationQuery(values), limit: 20 }).catch(() => null);
   const hasInventory = Boolean(result?.pagination.total);
-  return <><section className="page-hero"><div className="container"><span className="eyebrow">Location</span><h1>Property in {titleCase(location)}</h1><p className="muted">{hasInventory ? `${result?.pagination.total} published ${result?.pagination.total === 1 ? "property" : "properties"} currently available.` : "No published inventory is currently available for this location."}</p>{hasInventory && <div className="locations">{[["Buy", "sale"], ["Rent", "rent"], ["Short Stay", "short_stay"]].map(([label, purpose]) => <Link key={purpose} className="location-pill" href={`/discover?purpose=${purpose}&area=${encodeURIComponent(location)}`}>{label}</Link>)}</div>}</div></section><section className="section-tight"><div className="container">{result?.data.length ? <PropertyGrid properties={result.data} /> : <EmptyState title={`No properties in ${titleCase(location)}`} />}</div></section></>;
+  return <><section className="page-hero"><div className="container"><span className="eyebrow">Location</span><h1>Property in {titleCase(location)}</h1><p className="muted">{hasInventory ? `${result?.pagination.total} published ${result?.pagination.total === 1 ? "property" : "properties"} currently available.` : !result ? "Inventory is temporarily unavailable. Please try again." : "No published inventory is currently available for this location."}</p>{hasInventory && <div className="locations">{[["Buy", "sale"], ["Rent", "rent"], ["Short Stay", "short_stay"]].map(([label, purpose]) => <Link key={purpose} className="location-pill" href={`/discover?purpose=${purpose}&area=${encodeURIComponent(location)}`}>{label}</Link>)}</div>}</div></section><section className="section-tight"><div className="container">{!result ? <ErrorState /> : result.data.length ? <PropertyGrid properties={result.data} /> : <EmptyState title={`No properties in ${titleCase(location)}`} />}</div></section></>;
 }

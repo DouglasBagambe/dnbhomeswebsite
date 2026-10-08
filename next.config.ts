@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+import { validateProductionConfig } from "./src/lib/config-validation";
+
+validateProductionConfig(process.env);
+const mediaOrigins = (process.env.NEXT_PUBLIC_MEDIA_ORIGINS || "").split(",").map((origin) => origin.trim()).filter(Boolean).map((origin) => new URL(origin));
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   experimental: {
@@ -9,9 +14,10 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "**" },
-      ...(process.env.NODE_ENV === "development"
-        ? [{ protocol: "http" as const, hostname: "**" }]
+      { protocol: "https", hostname: "images.unsplash.com" },
+      ...mediaOrigins.map((url) => ({ protocol: "https" as const, hostname: url.hostname, port: url.port, pathname: "/**" })),
+      ...(process.env.NODE_ENV === "development" || process.env.HOMES_BUILD_PROFILE === "local"
+        ? [{ protocol: "http" as const, hostname: "localhost", port: "3000", pathname: "/media/**" }, { protocol: "http" as const, hostname: "127.0.0.1", port: "3000", pathname: "/media/**" }]
         : []),
     ],
   },

@@ -76,6 +76,7 @@ export interface Property {
   verificationStatus: "unverified" | "pending" | "verified" | "rejected";
   status: "published";
   publishedAt?: string;
+  updatedAt?: string;
   viewCount: number;
 }
 
