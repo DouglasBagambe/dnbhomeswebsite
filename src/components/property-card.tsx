@@ -13,13 +13,13 @@ export function PropertyCard({ property, compact = false }: { property: Property
   return <article className={`property-card ${compact ? "compact" : ""}`}>
     <FavoriteButton id={property._id} />
     <Link className="property-image" href={propertyPath(property)} aria-label={`View ${property.title}`}>
-      {image ? <Image src={image} alt={property.cover?.alt || property.title} fill unoptimized={bypassImageOptimization(image)} sizes="(max-width: 520px) 100vw, (max-width: 1024px) 50vw, 33vw" /> : <div className="image-placeholder">Homes property</div>}
+      {image ? <Image src={image} alt={property.cover?.alt || property.title} fill unoptimized={bypassImageOptimization(image)} sizes="(max-width: 620px) 100vw, (max-width: 1180px) 50vw, 25vw" /> : <div className="image-placeholder">Homes property</div>}
       <span className="purpose-badge">{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span>
     </Link>
     <div className="property-body">
-      <div className="property-price-row"><span className="price">{formatPrice(property.price)}</span>{property.verificationStatus === "verified" && <span className="verified-mark" title="Verified listing"><BadgeCheck size={17} /> Verified</span>}</div>
+      <div className="property-price-row"><strong className="price">{formatPrice(property.price)}</strong>{property.verificationStatus === "verified" && <span className="verified-mark" title="Verified listing"><BadgeCheck size={17} /> Verified</span>}</div>
       <h3><Link href={propertyPath(property)}>{property.title}</Link></h3>
-      <div className="property-location">{locationLabel(property)}</div>
+      <p className="property-location">{locationLabel(property)}</p>
       {facts && <div className="facts">{facts}</div>}
       <CompareButton property={property} />
     </div>

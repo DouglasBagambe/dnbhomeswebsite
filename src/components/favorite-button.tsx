@@ -1,5 +1,6 @@
 "use client";
 
+import { Heart } from "lucide-react";
 import { useCallback, useSyncExternalStore } from "react";
 import { FAVORITES_KEY, readIds, toggleId } from "@/lib/storage";
 
@@ -11,5 +12,5 @@ export function FavoriteButton({ id }: { id: string }) {
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
     window.dispatchEvent(new Event("homes:favorites"));
   };
-  return <button className={`favorite ${active ? "active" : ""}`} onClick={toggle} aria-label={active ? "Remove from saved properties" : "Save property"} aria-pressed={active}>{active ? "♥" : "♡"}</button>;
+  return <button className={`favorite ${active ? "active" : ""}`} onClick={toggle} aria-label={active ? "Remove from saved properties" : "Save property"} aria-pressed={active}><Heart size={18} aria-hidden="true" fill={active ? "currentColor" : "none"} /></button>;
 }

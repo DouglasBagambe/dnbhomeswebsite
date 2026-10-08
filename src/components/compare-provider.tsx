@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, useSyncExternalStore } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import type { Property } from "@/types/property";
 import { COMPARE_KEY } from "@/lib/storage";
@@ -18,6 +18,26 @@ export const readCompare = (storage: Pick<Storage, "getItem">): Property[] => {
 
 export function CompareProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const sheet = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const controls = () => sheet.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+    requestAnimationFrame(() => controls()?.[0]?.focus());
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+      if (event.key !== "Tab") return;
+      const elements = controls();
+      if (!elements?.length) return;
+      const first = elements[0], last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => { document.body.style.overflow = previousOverflow; document.removeEventListener("keydown", onKey); previousFocus?.focus(); };
+  }, [open]);
   const subscribe = useCallback((listener: () => void) => { window.addEventListener("homes:compare", listener); window.addEventListener("storage", listener); return () => { window.removeEventListener("homes:compare", listener); window.removeEventListener("storage", listener); }; }, []);
   const raw = useSyncExternalStore(subscribe, () => localStorage.getItem(COMPARE_KEY) ?? "[]", () => "[]");
   const items = useMemo(() => readCompare({ getItem: () => raw }), [raw]);
@@ -29,7 +49,7 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(() => ({ items, toggle, clear: () => save([]) }), [items, toggle, save]);
   return <CompareContext.Provider value={value}>{children}
     {items.length > 0 && <div className="compare-bar" role="status"><span><strong>{items.length}/2</strong> properties selected</span><div><button className="button secondary small" onClick={() => save([])}>Clear</button>{items.length === 2 && <button className="button small" onClick={() => setOpen(true)}>Compare</button>}</div></div>}
-    {open && <div className="compare-modal" role="dialog" aria-modal="true" aria-label="Compare properties"><div className="compare-sheet"><div className="section-heading"><div><span className="eyebrow">Side by side</span><h2>Compare properties</h2></div><button className="button secondary" onClick={() => setOpen(false)}>Close</button></div><table className="compare-table"><thead><tr><th>Detail</th>{items.map((item) => <th key={item._id}><Link href={`/properties/${item.slug}-${item._id}`}>{item.title}</Link></th>)}</tr></thead><tbody>{[
+    {open && <div className="compare-modal" role="dialog" aria-modal="true" aria-label="Compare properties"><div ref={sheet} className="compare-sheet"><div className="section-heading"><div><span className="eyebrow">Side by side</span><h2>Compare properties</h2></div><button className="button secondary" onClick={() => setOpen(false)}>Close</button></div><table className="compare-table"><thead><tr><th>Detail</th>{items.map((item) => <th key={item._id}><Link href={`/properties/${item.slug}-${item._id}`}>{item.title}</Link></th>)}</tr></thead><tbody>{[
       ["Price", ...items.map((item) => formatPrice(item.price))], ["Location", ...items.map(locationLabel)], ["Purpose", ...items.map((item) => item.purpose)], ["Type", ...items.map((item) => item.type)], ["Bedrooms", ...items.map((item) => item.bedrooms?.toString() ?? "—")], ["Bathrooms", ...items.map((item) => item.bathrooms?.toString() ?? "—")], ["Size", ...items.map((item) => item.size ? `${item.size} ${item.sizeUnit}` : "—")], ["Amenities", ...items.map((item) => item.amenities.join(", ") || "—")], ["Verified", ...items.map((item) => item.verificationStatus === "verified" ? "Yes" : "No")], ["Representative", ...items.map((item) => item.agent?.name ?? item.agency?.name ?? "—")],
     ].map((row) => <tr key={row[0]}>{row.map((cell, index) => index === 0 ? <th key={index}>{cell}</th> : <td key={index}>{cell}</td>)}</tr>)}</tbody></table></div></div>}
   </CompareContext.Provider>;

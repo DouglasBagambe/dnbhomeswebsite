@@ -25,11 +25,11 @@ export function HomeSearch() {
     }
     router.push(`/discover?${params}`);
   };
-  return <div className="search-shell container"><div className="search-box">
+  return <div className="search-shell"><div className="search-box" role="search" aria-label="Find property">
     <form action={submit} className="search-grid">
       <div className="search-field search-location"><label htmlFor="home-location">Location</label><input id="home-location" name="area" placeholder="Area or neighbourhood" /></div>
       <div className="search-field"><label htmlFor="home-purpose">Purpose</label><select id="home-purpose" value={purpose} onChange={(event) => setPurpose(event.target.value)}><option value="rent">Rent</option><option value="sale">Buy</option><option value="short_stay">Short Stay</option></select></div>
-      <div className="field"><label htmlFor="home-type">Property type</label><select id="home-type" name="type" defaultValue=""><option value="">Any type</option><option value="house">House</option><option value="apartment">Apartment</option><option value="land">Land</option><option value="commercial">Commercial</option><option value="serviced_apartment">Serviced apartment</option></select></div>
+      <div className="search-field"><label htmlFor="home-type">Property type</label><select id="home-type" name="type" defaultValue=""><option value="">Any type</option><option value="house">House</option><option value="apartment">Apartment</option><option value="land">Land</option><option value="commercial">Commercial</option><option value="serviced_apartment">Serviced apartment</option></select></div>
       <div className="search-field"><label htmlFor="home-budget">Budget</label><input id="home-budget" name="maxPrice" inputMode="numeric" placeholder="Any budget" /></div>
       <div className="search-field search-bedroom"><label htmlFor="home-bedrooms">Bedrooms</label><select id="home-bedrooms" name="bedrooms" defaultValue=""><option value="">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
       <button className="button search-submit" type="submit"><Search size={20} /><span>Search</span></button>

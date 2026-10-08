@@ -1,0 +1,63 @@
+/* Homes V2: palette, spacing and shape shared by every consumer route. */
+:root {
+  --emerald: #123D32;
+  --emerald-deep: #0B2A22;
+  --emerald-interactive: #185644;
+  --ivory: #F7F4EE;
+  --white: #FFFFFF;
+  --warm: #EFEAE0;
+  --brass: #B59660;
+  --brand-green: var(--emerald);
+  --brand-green-hover: var(--emerald-interactive);
+  --brand-green-soft: #E5EDE6;
+  --brand-gold: var(--brass);
+  --brand-gold-soft: var(--warm);
+  --ink: #151B18;
+  --ink-strong: #151B18;
+  --muted: #67716C;
+  --muted-light: #89918D;
+  --background: var(--ivory);
+  --surface: var(--warm);
+  --surface-raised: var(--white);
+  --surface-warm: var(--warm);
+  --border: #DDD8CE;
+  --border-strong: #CBC4B8;
+  --danger: #AD3025;
+  --success: var(--emerald-interactive);
+  --on-action: #FFFFFF;
+  --header-background: #F7F4EEF5;
+  --container: 1408px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --radius-control: 10px;
+  --radius-image: 16px;
+  --radius-feature: 24px;
+  --duration: 180ms;
+}
+html[data-resolved-theme="dark"] {
+  --brand-green: #78C3A2;
+  --brand-green-hover: #A0D8BE;
+  --brand-green-soft: #1C3429;
+  --ink: #F4F1E9;
+  --ink-strong: #F4F1E9;
+  --muted: #ADB5B0;
+  --muted-light: #89918D;
+  --background: #0C1210;
+  --surface: #111A16;
+  --surface-raised: #16221C;
+  --surface-warm: #111A16;
+  --border: #29352F;
+  --border-strong: #425048;
+  --danger: #FFACA4;
+  --success: #78C3A2;
+  --on-action: #0B2A22;
+  --header-background: #0C1210F5;
+}

@@ -26,3 +26,20 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chrome
       - run: npm run test:e2e
+      - name: Build against isolated visual QA inventory
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:3100/api/v1
+          NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3101
+        run: |
+          node e2e/fixtures/server.mjs &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid"' EXIT
+          node --input-type=module -e 'for(let i=0;i<40;i++){try{await fetch("http://127.0.0.1:3100/api/v1/properties");break}catch{if(i===39)throw new Error("Fixture API did not start");await new Promise(r=>setTimeout(r,250))}}'
+          npm run build
+      - name: Check responsive design and preserved consumer flows
+        run: npx playwright test --config playwright.visual.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: homes-v2-visual-qa
+          path: test-results/v2-screenshots

@@ -79,3 +79,28 @@ For local validation only, use `HOMES_BUILD_PROFILE=local npm run build` and `HO
 The image optimizer permits the named production media origins and the existing illustrative Unsplash host; replace illustrative marketing photos with approved genuine assets before launch. Production inventory must be created in Admin, never copied from the local demo database. The disabled Android download action stays disabled until a real HTTPS distribution URL is supplied. Contact actions remain optional; the contact form works without inventing Douglas's details. Douglas must approve the legal text and supply verified business/privacy contact details before launch.
 
 For verified Android App Links, set `ANDROID_APP_LINK_FINGERPRINTS` to the final Play **app signing** certificate fingerprints (not upload/debug fingerprints). The `/.well-known/assetlinks.json` route publishes only `com.nilebitlabs.dnbhomes`; it returns 404 until fingerprints are configured. After DNS/TLS setup, verify this response directly on dnbhomes.com without redirects. Nothing is deployed by this change.
+
+## V2 consumer presentation
+
+`revamp/v2-website` changes presentation on the production-readiness base; it does not migrate the API, storage keys, query schema, booking payloads, metadata or production validation. `src/styles/tokens.css` owns the light/dark palettes, spacing, radii and interaction duration. `globals.css` retains the existing class architecture for shared controls, discovery, cards, detail, content pages and responsive layouts. Inter remains locally bundled. Homes is the consumer identity; dnb remains the parent identity in the footer and existing legal/SEO information.
+
+Marketing photography is illustrative, not Uganda inventory. The eight files in `public/images/` are local copies of the existing Unsplash images already referenced by this website, now delivered through Next/Image. Original image CDN sources:
+
+- https://images.unsplash.com/photo-1600585154340-be6161a56a0c
+- https://images.unsplash.com/photo-1522708323590-d24dbb6b0267
+- https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea
+- https://images.unsplash.com/photo-1600607687939-ce8a6c25118c
+- https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde
+- https://images.unsplash.com/photo-1486406146926-c627a92ad1ab
+- https://images.unsplash.com/photo-1500382017468-9049fed747ef
+- https://images.unsplash.com/photo-1497366754035-f200968a6e72
+
+Replace these with approved genuine media before presenting them as real property/area photography. Location cards omit inventory totals because the homepage samples are not complete location counts. A healthy API with no inventory gets one honest empty state; unavailable inventory gets a distinct retry state. No demo inventory is introduced to production.
+
+### Isolated populated browser QA
+
+The existing `npx playwright test` suite retains the offline API profile and checks outages, navigation, empty states and retired routes. Additional responsive tests exercise populated cards, gallery, search, filters, removable chips, sorting, recent searches, browser-local saves/compare, keyboard restoration, viewing requests, contacts, secondary routes, contrast and light/dark modes. All synthetic POST requests terminate in `e2e/fixtures/server.mjs`, bound to loopback. It has no database or production connection. The fixtures are not included in app routes.
+
+For this suite, build with `HOMES_BUILD_PROFILE=local`, `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3100/api/v1` and `NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3101` while the fixture API is running, then stop the fixture and run `npx playwright test --config playwright.visual.config.ts`. CI performs both builds and suites. Do not deploy the local validation build. Set `HOMES_SCREENSHOTS` to an output directory to export screenshots; otherwise they are saved in `test-results/v2-screenshots` and uploaded by CI.
+
+The matrix covers 390×844, 430×932, 768×1024, 1024×768, 1280×800, 1440×900 and 1920×1080. Full screenshots at 390, 768 and 1440 cover home, discover and property detail in both themes. Manual visual review supplements overflow, image loading, hero collision and contrast checks.

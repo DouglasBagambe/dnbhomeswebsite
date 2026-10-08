@@ -29,7 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const organization = { "@context": "https://schema.org", "@type": "Organization", name: "dnb Homes", url: config.siteUrl };
   const themeScript = `(function(){try{var t=localStorage.getItem('homes-theme');if(t!=='light'&&t!=='dark')t='system';var r=t==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var e=document.documentElement;e.dataset.theme=t;e.dataset.resolvedTheme=r;e.style.colorScheme=r}catch(_){}})()`;
   return <html lang="en" data-scroll-behavior="smooth" data-theme="system" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head><body className={inter.variable}>
-    <a href="#main" style={{ position: "absolute", left: "-9999px" }}>Skip to content</a>
+    <a href="#main" className="skip-link">Skip to content</a>
     <CompareProvider><Header /><main id="main">{children}</main><Footer /></CompareProvider>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replaceAll("<", "\\u003c") }} />
   </body></html>;
