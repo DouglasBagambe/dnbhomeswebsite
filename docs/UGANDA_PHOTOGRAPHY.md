@@ -16,10 +16,11 @@ Android promotional panels. Assets and aspect ratio remain unchanged; themes
 switch without adding a new React hydration-dependent state. Existing visual
 coverage remains intact. Only the exact Commons host/path is added to Next's
 remote image patterns; configured production media origins remain required and
-validated. Preview property photographs currently come from the existing Render
-media service and carry visible credits in each description.
+validated. The fixed preview inventory photographs are served from the stable website
+showcase path and carry visible credits in each description; see
+[DURABLE_SHOWCASE_MEDIA.md](DURABLE_SHOWCASE_MEDIA.md).
 
 The backend's `homes_preview` inventory contains fictional unverified showcase
-records. Render uploads currently use ephemeral disk; durable media storage is
-required before launch. No API contracts, routes, search behavior, production
-guards or main branches are changed by this content/logo task.
+records. The fixed showcase images are durable website static assets. Future real
+property uploads require durable object storage. API contracts, routes, search
+behavior, branding and production guards remain unchanged.

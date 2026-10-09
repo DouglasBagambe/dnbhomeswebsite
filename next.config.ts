@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "upload.wikimedia.org", port: "", pathname: "/wikipedia/commons/**", search: "" },
+      { protocol: "https", hostname: "dnbhomeswebsite-psi.vercel.app", port: "", pathname: "/images/uganda/showcase/*.jpg", search: "" },
       ...mediaOrigins.map((url) => ({ protocol: "https" as const, hostname: url.hostname, port: url.port, pathname: "/**" })),
       ...(process.env.NODE_ENV === "development" || process.env.HOMES_BUILD_PROFILE === "local"
         ? [{ protocol: "http" as const, hostname: "localhost", port: "3000", pathname: "/media/**" }, { protocol: "http" as const, hostname: "127.0.0.1", port: "3000", pathname: "/media/**" }]
