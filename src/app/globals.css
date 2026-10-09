@@ -252,7 +252,9 @@ h3 { font-size: 1.05rem; font-weight: 600; }
 .profile-listings { margin-top: 58px; }
 
 
-.brand-symbol { font-size: 2rem; font-weight: 600; letter-spacing: -.12em; line-height: 1; border-right: 1px solid var(--border-strong); padding-right: var(--space-4); }
+.brand-mark { display: inline-flex; flex: 0 0 auto; width: 44px; height: 44px; }
+.brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+html[data-resolved-theme="dark"] .brand-mark img, .footer .brand-mark img, .app-brand-lockup .brand-mark img, .app-mark-panel .brand-mark img { content: url("/brand/dnb-mark-dark.svg"); }
 
 .brand-wordmark { font-size: 1.125rem; font-weight: 650; letter-spacing: .08em; }
 
@@ -273,7 +275,7 @@ h3 { font-size: 1.05rem; font-weight: 600; }
 
 .app-brand-lockup strong, .app-mark-panel strong { font-size: 1.5rem; font-weight: 500; line-height: 1.35; letter-spacing: -.035em; }
 
-.app-brand-lockup .app-monogram, .app-mark-panel .app-monogram { font-size: 5rem; font-weight: 550; line-height: 1; letter-spacing: -.12em; }
+.app-brand-lockup .app-monogram, .app-mark-panel .app-monogram { width: 100px; height: 100px; }
 
 .footer-parent { display: block; color: #BAC8C0; font-size: .75rem; }
 
@@ -339,7 +341,7 @@ input[type="date"], input[type="time"] { min-width: 0; }
 .skip-link { position: fixed; z-index: 200; left: 16px; top: -100px; padding: 12px 20px; background: var(--surface-raised); color: var(--ink); border: 1px solid var(--border); }
 .skip-link:focus { top: 12px; }
 .property-card a:focus-visible { outline-offset: 3px; }
-.footer .brand-symbol { border-color: #52685E; }
+
 .header-app-link { font-size: .75rem !important; }
 .results-top select { min-height: 44px; padding: 8px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-control); }
 .compare-sheet { overscroll-behavior: contain; }
@@ -404,7 +406,7 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
 @media (max-width: 767px) {
   .container { width: calc(100% - 40px); }
   .header { height: 68px; }
-  .brand-symbol { font-size: 1.75rem; }
+  .brand-mark { width: 38px; height: 38px; }
   .brand-wordmark { font-size: 1rem; }
   .home-hero { padding-top: 0; width: 100%; }
   .hero-frame { height: 640px; border-radius: 0; }
@@ -448,7 +450,7 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
   .app-brand-lockup, .app-mark-panel { border-left: 0; border-top: 1px solid #FFFFFF30; padding: 32px 0 0; }
   .app-brand-lockup strong { font-size: 1.5rem; }
   .app-copy h2 { font-size: 2rem; }
-  .app-brand-lockup .app-monogram, .app-mark-panel .app-monogram { font-size: 3.5rem; }
+  .app-brand-lockup .app-monogram, .app-mark-panel .app-monogram { width: 80px; height: 80px; }
   .footer { margin-top: 16px; padding-top: 48px; }
   .footer-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 32px 24px; }
   .footer-brand-block { grid-column: 1 / -1; }

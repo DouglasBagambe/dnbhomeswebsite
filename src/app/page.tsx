@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/brand";
 import Image from "next/image";
 import Link from "next/link";
 import { BadgeCheck, CalendarCheck, MapPin, ShieldCheck } from "lucide-react";
@@ -7,24 +8,25 @@ import { ListingSection } from "@/components/section";
 import { getProperties } from "@/lib/api";
 import { bypassImageOptimization, imageFor } from "@/lib/storage";
 import type { PropertyPage } from "@/types/property";
+import ugandaPhotography from "@/data/uganda-photography.json";
 
 const DEMO_IMAGES = [
-  "/images/1600585154340-be6161a56a0c.jpg",
-  "/images/1600566753086-00f18fb6b3ea.jpg",
-  "/images/1600607687939-ce8a6c25118c.jpg",
-  "/images/1600047509807-ba8f99d2cdde.jpg",
-  "/images/1486406146926-c627a92ad1ab.jpg",
+  "/images/uganda/gated-home.jpg",
+  "/images/uganda/kololo-block.jpg",
+  "/images/uganda/hotel-building.jpg",
+  "/images/uganda/grassland.jpg",
+  "/images/uganda/kampala-commercial.jpg",
 ];
 
 const CATEGORY_IMAGES = {
-  rent: "/images/1522708323590-d24dbb6b0267.jpg",
-  buy: "/images/1600585154340-be6161a56a0c.jpg",
-  shortStay: "/images/1600566753086-00f18fb6b3ea.jpg",
-  land: "/images/1500382017468-9049fed747ef.jpg",
-  commercial: "/images/1497366754035-f200968a6e72.jpg",
+  rent: "/images/uganda/kololo-block.jpg",
+  buy: "/images/uganda/gated-home.jpg",
+  shortStay: "/images/uganda/hotel-building.jpg",
+  land: "/images/uganda/grassland.jpg",
+  commercial: "/images/uganda/kampala-commercial.jpg",
 } as const;
 
-const HERO_IMAGE = "/images/1600585154340-be6161a56a0c.jpg";
+const HERO_IMAGE = "/images/uganda/gated-home.jpg";
 
 const safe = async (query: Parameters<typeof getProperties>[0]): Promise<PropertyPage & { unavailable?: boolean }> => {
   try { return await getProperties(query); } catch { return { unavailable: true, data: [], pagination: { page: 1, limit: 8, total: 0, pages: 0 } }; }
@@ -48,10 +50,10 @@ export default async function HomePage() {
   const locationCards = [...new Set(uniqueInventory.map((property) => property.location.area).filter(Boolean))].slice(0, 8).map((name, index) => { const property = uniqueInventory.find((item) => item.location.area === name)!; return { name, district: property.location.district, illustrative: !imageFor(property), image: imageFor(property) || DEMO_IMAGES[(index + 1) % DEMO_IMAGES.length] }; });
   return <>
     <section className="home-hero container">
-      <div className="hero-frame"><Image className="hero-media" src={heroImage} alt="Illustrative contemporary home with an open garden" fill loading="eager" unoptimized={bypassImageOptimization(heroImage)} sizes="(max-width: 1440px) 100vw, 1440px" /><div className="hero-overlay" /><div className="hero-copy"><span className="eyebrow">Property discovery in Uganda</span><h1>Find your place<br />in Uganda.</h1><p>Homes, apartments, land and commercial spaces.<br className="desktop-break" /> Clearer details. A considered next step.</p></div><HomeSearch /><span className="hero-image-note">Illustrative property photography</span></div>
+      <div className="hero-frame"><Image className="hero-media" src={heroImage} alt="Illustrative home and compound in Uganda" fill loading="eager" unoptimized={bypassImageOptimization(heroImage)} sizes="(max-width: 1440px) 100vw, 1440px" /><div className="hero-overlay" /><div className="hero-copy"><span className="eyebrow">Property discovery in Uganda</span><h1>Find your place<br />in Uganda.</h1><p>Homes, apartments, land and commercial spaces.<br className="desktop-break" /> Clearer details. A considered next step.</p></div><HomeSearch /><span className="hero-image-note">Illustrative Uganda photography · Credits below</span></div>
     </section>
 
-    <section className="section home-first-section"><div className="container"><div className="section-heading"><div><span className="eyebrow">A place for every purpose</span><h2>What brings you here?</h2></div><p className="muted section-note">A new chapter. A short stay.<br />Or space for what comes next.</p></div><div className="category-grid">{categories.map(([label, href, note, image]) => <Link className="category" key={href} href={href}><Image src={image} alt="" fill unoptimized={bypassImageOptimization(image)} sizes="(max-width: 760px) 50vw, 20vw" /><span className="image-shade" /><span className="category-copy"><small>{note}</small><strong>{label}<span aria-hidden="true">↗</span></strong></span></Link>)}</div><p className="photography-note">Illustrative photography. Explore each category for current listings.</p></div></section>
+    <section className="section home-first-section"><div className="container"><div className="section-heading"><div><span className="eyebrow">A place for every purpose</span><h2>What brings you here?</h2></div><p className="muted section-note">A new chapter. A short stay.<br />Or space for what comes next.</p></div><div className="category-grid">{categories.map(([label, href, note, image]) => <Link className="category" key={href} href={href}><Image src={image} alt="" fill unoptimized={bypassImageOptimization(image)} sizes="(max-width: 760px) 50vw, 20vw" /><span className="image-shade" /><span className="category-copy"><small>{note}</small><strong>{label}<span aria-hidden="true">↗</span></strong></span></Link>)}</div><details className="photography-note"><summary>Illustrative Uganda photography · Media credits</summary><p>These photographs illustrate property types, not the exact showcase listings.</p><ul>{ugandaPhotography.map((photo) => <li key={photo.id}><a href={photo.sourceUrl}>{photo.title}</a> — {photo.author}, <a href={photo.licenseUrl}>{photo.license}</a>. Displayed resized/cropped; adaptations retain this licence.</li>)}</ul></details></div></section>
 
     {featured.data.length > 0 && <ListingSection title="Featured homes" subtitle="Selected properties worth a closer look." properties={featured.data} href="/discover?featured=true" />}
     {popular.data.length > 0 && <ListingSection title="Popular right now" subtitle="Properties people are exploring most." properties={popular.data} href="/discover?sort=popular" />}
@@ -65,6 +67,6 @@ export default async function HomePage() {
       [BadgeCheck, "Verified where confirmed", "Badges appear only after the relevant Homes checks."], [ShieldCheck, "Clear representative details", "See who is responsible for the listing before you enquire."], [CalendarCheck, "Safer viewing requests", "Requests stay pending until a representative confirms them."],
     ].map(([Icon, title, copy]) => { const TrustIcon = Icon as typeof BadgeCheck; return <div className="trust-item" key={String(title)}><TrustIcon size={24} /><h3>{String(title)}</h3><p>{String(copy)}</p></div>; })}</div></div></section>
 
-    <section className="section"><div className="container app-banner"><div className="app-copy"><span className="eyebrow">Homes for Android</span><h2>Take your property search with you.</h2><p>Save homes, compare details and request viewings wherever you are.</p><Link className="button" href="/download">Get the Android app</Link></div><div className="app-brand-lockup" aria-label="Homes for Android"><span className="app-monogram" aria-hidden="true">H.</span><strong>Homes, wherever<br />you find yourself.</strong><span>Discover. Save. Request a viewing.</span></div></div></section>
+    <section className="section"><div className="container app-banner"><div className="app-copy"><span className="eyebrow">Homes for Android</span><h2>Take your property search with you.</h2><p>Save homes, compare details and request viewings wherever you are.</p><Link className="button" href="/download">Get the Android app</Link></div><div className="app-brand-lockup" aria-label="Homes for Android"><BrandMark className="app-monogram" /><strong>Homes, wherever<br />you find yourself.</strong><span>Discover. Save. Request a viewing.</span></div></div></section>
   </>;
 }
