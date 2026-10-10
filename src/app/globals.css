@@ -532,6 +532,7 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
 @media(max-width:760px) { .media-dialog-controls { font-size: .8rem; } }
 
 /* Discover uses one query in both modes; the stage owns only active media. */
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 .discovery-mode { display:flex; align-items:center; gap:4px; margin:0 0 20px; padding:4px; width:fit-content; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
 .discovery-mode button { display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:8px 20px; border:0; border-radius:8px; background:transparent; color:var(--ink); cursor:pointer; }
 .discovery-mode button.selected { background:var(--brand-green); color:var(--on-action); }
@@ -609,6 +610,17 @@ body:has(.is-swipe) .filters.open { z-index:70; }
 @media(min-width:621px) and (max-width:1023px) { .filter-layout .property-grid { grid-template-columns:1fr; } }
 
 @media(max-width:1023px) { .swipe-copy { height:110px; flex:none; } .swipe-property-navigation { min-height:44px; } }
+
+@media (min-width:601px) and (max-width:1023px) {
+ .is-swipe { position:fixed; inset:72px 0 0; z-index:30; height:calc(100dvh - 72px); background:var(--background); padding:16px 16px max(16px,env(safe-area-inset-bottom)); display:flex; flex-direction:column; }
+ .is-swipe .discovery-mode { margin:0 0 12px; flex:none; }
+ .is-swipe .swipe-stage { flex:1; height:auto; min-height:0; max-height:none; }
+}
+@media (max-width:1023px) {
+ body:has(.is-swipe) .filters { display:none; }
+ body:has(.is-swipe) .filters.open { display:grid; position:fixed; inset:88px 16px max(16px,env(safe-area-inset-bottom)); width:min(560px,calc(100vw - 32px)); margin-inline:auto; max-height:none; overflow:auto; z-index:70; }
+ body:has(.is-swipe) .filter-close { display:grid; }
+}
 
 .swipe-media { user-select:none; -webkit-user-select:none; }
 

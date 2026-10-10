@@ -9,6 +9,14 @@ for(const [width,height] of sizes) for(const theme of ['light','dark']) {
   await expect(page).toHaveURL(/purpose=rent&type=house&maxPrice=9000000&bedrooms=2.*mode=swipe/);
   const stage=page.getByRole('article',{name:'Swipe property discovery'});
   await expect(stage).toBeVisible();
+  if (width <= 1023) {
+   const bounds=(await stage.boundingBox())!;expect(bounds.width).toBeGreaterThan(width*.9);expect(bounds.y+bounds.height).toBeLessThanOrEqual(height);
+   await page.getByRole('button',{name:'Refine Swipe filters',exact:true}).click();
+   const filters=page.locator('#property-filters');await expect(filters).toBeVisible();
+   const filterBounds=(await filters.boundingBox())!;expect(filterBounds.y).toBeGreaterThanOrEqual(64);expect(filterBounds.y+filterBounds.height).toBeLessThanOrEqual(height);
+   await expect(filters.getByLabel('Purpose',{exact:true})).toHaveValue('rent');
+   await page.getByRole('button',{name:'Close filters',exact:true}).click();await expect(filters).toBeHidden();
+  }
   if (width >= 1024) {
    await expect.poll(async()=>{const bounds=await stage.boundingBox();return bounds!.y;}).toBeLessThan(260);
    const bounds=(await stage.boundingBox())!;expect(bounds.y+bounds.height).toBeLessThanOrEqual(height+24);
@@ -34,6 +42,9 @@ for(const [width,height] of sizes) for(const theme of ['light','dark']) {
   await stage.getByRole('button',{name:'Open comparison'}).click();
   await expect(page.getByRole('dialog',{name:'Compare properties'})).toBeVisible();
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog',{name:'Compare properties'})).toBeHidden();
+  await expect(page.getByRole('button',{name:'Swipe',exact:true})).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('.swipe-counter')).toContainText('2 /');
   await stage.getByRole('link',{name:'View details'}).click();
   await expect(page).toHaveURL(/properties/); await page.goBack();
   await expect(page.locator('.swipe-counter')).toContainText('2 /');
@@ -45,6 +56,13 @@ for(const [width,height] of sizes) for(const theme of ['light','dark']) {
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  });
 }
+test('Comparison owns Escape even before its focus transfer and pauses Swipe video',async({page})=>{
+ await page.goto('/discover?q=media-heavy&mode=swipe');const stage=page.getByRole('article',{name:'Swipe property discovery'});
+ await stage.getByRole('button',{name:'Add to compare'}).click();await stage.getByRole('button',{name:'Next property',exact:true}).click();await stage.getByRole('button',{name:'Add to compare'}).click();await stage.getByRole('button',{name:'Previous property',exact:true}).click();
+ for(let i=0;i<20;i++)await stage.getByRole('button',{name:'Next media',exact:true}).click();const video=stage.locator('video');await video.evaluate((element:HTMLVideoElement)=>element.play());await expect.poll(()=>video.evaluate((element:HTMLVideoElement)=>element.paused)).toBe(false);
+ await stage.getByRole('button',{name:'Open comparison'}).click();await expect(page.getByRole('dialog',{name:'Compare properties'})).toBeVisible();await expect.poll(()=>video.evaluate((element:HTMLVideoElement)=>element.paused)).toBe(true);
+ await stage.focus();await page.keyboard.press('Escape');await expect(page.getByRole('dialog',{name:'Compare properties'})).toBeHidden();await expect(page).toHaveURL(/mode=swipe/);await expect(page.locator('.swipe-counter')).toContainText('1 /');await expect.poll(()=>video.evaluate((element:HTMLVideoElement)=>element.paused)).toBe(true);
+});
 test('Swipe mixed media allocates one player; failure and hidden tabs pause safely',async({page})=>{
  await page.goto('/discover?q=media-heavy&mode=swipe');
  const stage=page.locator('.swipe-stage');

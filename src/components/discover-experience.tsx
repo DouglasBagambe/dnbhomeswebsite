@@ -148,6 +148,7 @@ export function DiscoverExperience({ result, queryKey }: { result: PropertyPage;
       <p id="swipe-instructions" className="sr-only">Swipe up or down for homes, left or right for media. Use arrow keys or the labelled navigation buttons. Escape returns to Grid.</p>
       <RecentProperty id={property._id} /><article ref={stage} className="swipe-stage" tabIndex={0} aria-label="Swipe property discovery" aria-describedby="swipe-instructions"
         onKeyDown={event => {
+          if (document.querySelector('[role="dialog"][aria-modal="true"], dialog[open]')) return;
           if (event.key === "Escape") { changeMode("grid"); return; }
           if ((event.target as HTMLElement).closest("input, textarea, select, video, button, a")) return;
           const actions: Record<string, () => void> = { ArrowDown: () => propertyStep(1), ArrowUp: () => propertyStep(-1), ArrowRight: () => mediaStep(1), ArrowLeft: () => mediaStep(-1) };
@@ -183,7 +184,7 @@ export function DiscoverExperience({ result, queryKey }: { result: PropertyPage;
         <div className="swipe-information">
           <div className="swipe-copy"><span className="eyebrow">Your next place</span><p className="swipe-price">{formatPrice(property.price)}</p><h2>{property.title}</h2><p className="swipe-location"><MapPin size={16} />{locationLabel(property)}</p><p className="swipe-facts">{[property.bedrooms ? `${property.bedrooms} beds` : "", property.bathrooms ? `${property.bathrooms} baths` : "", property.size ? `${property.size} ${property.sizeUnit}` : ""].filter(Boolean).join(" · ") || property.type.replaceAll("_", " ")}{property.verificationStatus === "verified" && <span> · Verified</span>}</p></div>
           <div className="swipe-actions" onClickCapture={pause}><FavoriteButton id={property._id} /><CompareButton property={property} /><ShareButton url={typeof window === "undefined" ? href : `${window.location.origin}${href}`} title={property.title} /></div>
-          <div className="swipe-primary-actions"><OpenComparisonButton /><Link className="button secondary" href={href} onClick={pause}>View details</Link><button className="button" onClick={() => { pause(); viewing.current?.showModal(); }}>Request viewing</button></div>
+          <div className="swipe-primary-actions" onClickCapture={pause}><OpenComparisonButton /><Link className="button secondary" href={href} onClick={pause}>View details</Link><button className="button" onClick={() => { pause(); viewing.current?.showModal(); }}>Request viewing</button></div>
           <div className="swipe-property-navigation"><button className="button secondary" aria-label="Previous property" disabled={position.property === 0} onClick={() => propertyStep(-1)}><ArrowUp size={18} />Previous</button>{position.property < items.length - 1 ? <button className="button secondary" aria-label="Next property" onClick={() => propertyStep(1)}>Next<ArrowDown size={18} /></button> : pagination.page < pagination.pages ? <button className="button secondary" onClick={more} disabled={loading}>{loading ? "Loading…" : "More homes"}</button> : <span>Last home in these results</span>}</div>
           {error && <p role="alert">{error}</p>}
         </div>
