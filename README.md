@@ -54,7 +54,7 @@ Optional:
 
 ## Functional scope
 
-Published discovery/detail, viewing requests, public agent and agency directories, contact messages, and property-onboarding leads use the V1 backend. Saved homes, comparison, and the guest viewing-request history are intentionally device-local; the UI says so and does not imply account sync.
+Published discovery/detail, viewing requests, public agent and agency directories, and contact messages use the V1 backend. Property creation and management remain Admin-controlled; there is no public self-listing flow. Guest Saved, comparison and viewing history remain device-local. Optional verified consumer accounts synchronize Saved, comparison, recent properties, preferences and owned viewing history across Website and shared Flutter clients. Hosted accounts require the email delivery and security configuration described below.
 
 ## Deployment
 
