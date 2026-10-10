@@ -43,3 +43,41 @@ jobs:
         with:
           name: homes-v2-visual-qa
           path: test-results/v2-screenshots
+  consumer-accounts:
+    runs-on: ubuntu-22.04
+    env:
+      HOMES_BUILD_PROFILE: local
+      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:3100/api/v1
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3101
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: dnbhomeswebsite
+      - uses: actions/checkout@v4
+        with:
+          repository: DouglasBagambe/dnbhomesbackend
+          ref: 02cd183bc89e52f3ae63c382bae6a923322487d3
+          path: dnbhomesbackend
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+          cache: npm
+          cache-dependency-path: |
+            dnbhomeswebsite/package-lock.json
+            dnbhomesbackend/package-lock.json
+      - run: npm ci
+        working-directory: dnbhomesbackend
+      - run: npm ci
+        working-directory: dnbhomeswebsite
+      - run: npm run build
+        working-directory: dnbhomeswebsite
+      - run: npx playwright install --with-deps chrome
+        working-directory: dnbhomeswebsite
+      - name: Verify real ownership, private sessions and cross-device state
+        run: npx playwright test --config playwright.accounts.config.ts
+        working-directory: dnbhomeswebsite
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: homes-account-qa
+          path: dnbhomeswebsite/test-results

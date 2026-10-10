@@ -1,3 +1,4 @@
+import { RecentProperty } from "@/components/recent-property";
 import type { Metadata } from "next";
 import { PropertyGallery } from "@/components/property-gallery";
 import Link from "next/link";
@@ -34,7 +35,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const contact = property.agent ?? property.agency;
   const listingJson = { "@context": "https://schema.org", "@type": property.type === "house" || property.type === "apartment" ? "Residence" : "RealEstateListing", name: property.title, description: property.description, url: canonical, image: gallery.map((image) => image.url), address: { "@type": "PostalAddress", streetAddress: property.location.address || undefined, addressLocality: property.location.area || undefined, addressRegion: property.location.district || property.location.region || undefined, addressCountry: property.location.country || "Uganda" }, offers: { "@type": "Offer", price: property.price.amount, priceCurrency: property.price.currency } };
   const breadcrumbs = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: config.siteUrl }, { "@type": "ListItem", position: 2, name: "Discover", item: `${config.siteUrl}/discover` }, { "@type": "ListItem", position: 3, name: property.title, item: canonical }] };
-  return <>
+  return <><RecentProperty id={property._id} />
     <section className="section-tight property-detail"><div className="container">
       <nav aria-label="Breadcrumb" className="detail-breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/discover">Discover</Link><span>/</span><span>{property.location.area || property.title}</span></nav>
       <div className="detail-heading"><div>{property.verificationStatus === "verified" && <span className="verified-mark"><ShieldCheck size={16} /> Verified listing</span>}<h1>{property.title}</h1><p><MapPin size={16} /> {locationLabel(property) || property.location.address}</p></div><div className="detail-actions"><div className="detail-favorite"><FavoriteButton id={property._id} /></div><ShareButton url={canonical} title={property.title} /></div></div>

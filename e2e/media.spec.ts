@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-const heavy='/properties/media-heavy-qa-507f1f77bcf86cd799439080';
+const heavy='/properties/media-heavy-qa-6aca1225ca3d4ce6f2209da4';
 for(const viewport of [{width:390,height:844},{width:1440,height:900}]) {
   test(`25 media are accessible, lazy and keyboard navigable ${viewport.width}`,async({page})=>{
-    await page.setViewportSize(viewport);const videos:string[]=[];page.on('request',r=>{if(r.url().includes('.webm'))videos.push(r.url())});
+    await page.setViewportSize(viewport);const videos:string[]=[];page.on('request',r=>{if(r.url().includes('.mp4'))videos.push(r.url())});
     await page.goto(heavy,{waitUntil:'networkidle'});await expect(page.getByRole('button',{name:'View all media · 20 images · 5 videos'})).toBeVisible();
     expect(videos).toHaveLength(0);await page.getByRole('button',{name:'View all media · 20 images · 5 videos'}).click();
     const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();await expect(dialog.getByLabel('Choose gallery media').getByRole('button')).toHaveCount(25);
@@ -21,7 +21,7 @@ test('failed image fallback retains the frame and gallery survives',async({page}
 });
 
 test('viewing refresh fetches authorized status, persists it and keeps copies on failure',async({page})=>{
-  const record={id:'507f1f77bcf86cd799439080',propertyId:'507f1f77bcf86cd799439080',propertyTitle:'QA viewing',reference:'HOM-20261010-ABCDEF',scheduledAt:'2027-01-01T12:00:00Z',status:'pending',createdAt:'2026-10-10T12:00:00Z',statusAccessToken:'x'.repeat(43)};
+  const record={id:'6aca1225ca3d4ce6f2209da4',propertyId:'6aca1225ca3d4ce6f2209da4',propertyTitle:'QA viewing',reference:'HOM-20261010-ABCDEF',scheduledAt:'2027-01-01T12:00:00Z',status:'pending',createdAt:'2026-10-10T12:00:00Z',statusAccessToken:'x'.repeat(43)};
   await page.addInitScript(item=>localStorage.setItem('homes:bookings:v1',JSON.stringify([item,{...item,id:undefined,statusAccessToken:undefined,reference:'HOM-20261010-123456'}])),record);
   let fail=false;
   await page.route('**/api/bookings/*/status',async route=>{

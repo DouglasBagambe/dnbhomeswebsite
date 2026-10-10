@@ -83,6 +83,6 @@ test("mobile menu, filters, keyboard focus and empty state",async({page})=>{
 test("secondary routes retain the shared system without overflow",async({page})=>{
  await page.setViewportSize({width:390,height:844});
  for(const route of ['/rent','/buy','/short-stay','/land','/commercial','/favorites','/bookings','/locations/uganda','/about','/contact','/help','/safety','/download','/privacy','/terms','/agents','/agencies']){
-  await page.goto(route,{waitUntil:'domcontentloaded'});await expect(page.locator('h1')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+   await page.goto(route,{waitUntil:'domcontentloaded'});await expect(page.getByRole('heading',{level:1})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
 });

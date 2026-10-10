@@ -1,6 +1,6 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
-  testDir: "./e2e", testMatch: ["visual.spec.ts", "media.spec.ts"], workers: 1, timeout: 60000,
+  testDir: "./e2e", testMatch: ["visual.spec.ts", "media.spec.ts", "swipe.spec.ts"], workers: 1, timeout: 60000,
   use: { baseURL: "http://127.0.0.1:3101", channel: "chrome", trace: "retain-on-failure" },
   webServer: [
     { command: "node e2e/fixtures/server.mjs", url: "http://127.0.0.1:3100/api/v1/properties", reuseExistingServer: false },

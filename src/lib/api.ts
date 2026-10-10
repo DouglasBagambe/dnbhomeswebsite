@@ -38,10 +38,11 @@ export async function getProperty(idOrSlug: string): Promise<Property> {
 export async function submitBooking(
   body: Record<string, string>,
   idempotencyKey: string,
+  token?: string,
 ): Promise<Booking> {
   const result = await request<{ data: Booking }>("/bookings", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
+    headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: JSON.stringify(body),
   });
   return result.data;

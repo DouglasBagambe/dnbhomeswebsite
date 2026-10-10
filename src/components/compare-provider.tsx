@@ -6,7 +6,7 @@ import type { Property } from "@/types/property";
 import { COMPARE_KEY } from "@/lib/storage";
 import { formatPrice, locationLabel } from "@/lib/format";
 
-interface CompareValue { items: Property[]; toggle: (property: Property) => void; clear: () => void; }
+interface CompareValue { items: Property[]; toggle: (property: Property) => void; clear: () => void; open: () => void; }
 const CompareContext = createContext<CompareValue | null>(null);
 
 export const readCompare = (storage: Pick<Storage, "getItem">): Property[] => {
@@ -46,7 +46,7 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
     if (items.some((item) => item._id === property._id)) save(items.filter((item) => item._id !== property._id));
     else if (items.length < 2) save([...items, property]);
   }, [items, save]);
-  const value = useMemo(() => ({ items, toggle, clear: () => save([]) }), [items, toggle, save]);
+  const value = useMemo(() => ({ items, toggle, clear: () => save([]), open: () => setOpen(true) }), [items, toggle, save]);
   return <CompareContext.Provider value={value}>{children}
     {items.length > 0 && <div className="compare-bar" role="status"><span><strong>{items.length}/2</strong> properties selected</span><div><button className="button secondary small" onClick={() => save([])}>Clear</button>{items.length === 2 && <button className="button small" onClick={() => setOpen(true)}>Compare</button>}</div></div>}
     {open && <div className="compare-modal" role="dialog" aria-modal="true" aria-label="Compare properties"><div ref={sheet} className="compare-sheet"><div className="section-heading"><div><span className="eyebrow">Side by side</span><h2>Compare properties</h2></div><button className="button secondary" onClick={() => setOpen(false)}>Close</button></div><table className="compare-table"><thead><tr><th>Detail</th>{items.map((item) => <th key={item._id}><Link href={`/properties/${item.slug}-${item._id}`}>{item.title}</Link></th>)}</tr></thead><tbody>{[
@@ -62,3 +62,5 @@ export function CompareButton({ property }: { property: Property }) {
   const disabled = !active && context.items.length >= 2;
   return <button className={`compare-control ${active ? "active" : ""}`} disabled={disabled} onClick={() => context.toggle(property)} aria-pressed={active}>{active ? "Remove from compare" : disabled ? "Compare limit reached" : "Add to compare"}</button>;
 }
+
+export function OpenComparisonButton() { const context = useContext(CompareContext); return <button className="button secondary" disabled={context?.items.length !== 2} onClick={() => context?.open()} aria-label="Open comparison">Compare {context?.items.length ?? 0}/2</button>; }

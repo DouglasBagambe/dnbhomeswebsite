@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { ConsumerProvider } from "@/components/consumer-provider";
 import { CompareProvider } from "@/components/compare-provider";
 import { config } from "@/lib/config";
 import "./globals.css";
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const themeScript = `(function(){try{var t=localStorage.getItem('homes-theme');if(t!=='light'&&t!=='dark')t='system';var r=t==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var e=document.documentElement;e.dataset.theme=t;e.dataset.resolvedTheme=r;e.style.colorScheme=r}catch(_){}})()`;
   return <html lang="en" data-scroll-behavior="smooth" data-theme="system" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head><body className={inter.variable}>
     <a href="#main" className="skip-link">Skip to content</a>
-    <CompareProvider><Header /><main id="main">{children}</main><Footer /></CompareProvider>
+    <ConsumerProvider><CompareProvider><Header /><main id="main">{children}</main><Footer /></CompareProvider></ConsumerProvider>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replaceAll("<", "\\u003c") }} />
   </body></html>;
 }
