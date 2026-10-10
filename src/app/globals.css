@@ -86,14 +86,17 @@ h3 { font-size: 1.05rem; font-weight: 600; }
 .favorite { position: absolute; z-index: 2; top: 10px; right: 10px; width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 1px solid #FFFFFF80; border-radius: 50%; background: #FFFFFFF0; color: #151B18; cursor: pointer; }
 .favorite.active { color: #123D32; background: #E5EDE6; }
 .purpose-badge { position: absolute; top: var(--space-4); left: var(--space-4); padding: 5px 10px; border-radius: 6px; background: #FFFFFFF0; color: #151B18; font-size: .6875rem; font-weight: 600; }
-.property-body { padding-top: var(--space-4); }
-.property-body h3 { margin: 8px 0 6px; font-size: .9375rem; font-weight: 500; line-height: 1.45; }
-.property-price-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-.price { display: block; color: var(--ink-strong); font-size: 1.25rem; font-weight: 650; letter-spacing: -.035em; }
-.verified-mark { display: inline-flex; align-items: center; gap: 4px; color: var(--brand-green); font-size: .6875rem; font-weight: 600; }
-.facts, .property-location { color: var(--muted); font-size: .8125rem; line-height: 1.65; }
-.property-location { margin: 0 0 var(--space-2); color: var(--muted); }
-.compare-control { min-height: 44px; margin-top: var(--space-2); padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: .75rem; font-weight: 500; text-decoration: underline; text-underline-offset: 4px; transition: color var(--duration); }
+.property-body { display: grid; grid-template-rows: auto auto auto auto; gap: 4px; padding-top: 10px; }
+.property-body h3 { margin: 0; font-size: .9375rem; font-weight: 500; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: calc(1.35em * 2); }
+.property-price-row { display: flex; align-items: center; min-height: 1.4em; }
+.price { display: block; color: var(--ink-strong); font-size: 1.2rem; font-weight: 650; letter-spacing: -.03em; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.property-meta-row { display: flex; align-items: center; gap: 8px; min-height: 1.4em; }
+.verified-mark { display: inline-flex; align-items: center; gap: 3px; color: var(--brand-green); font-size: .6875rem; font-weight: 600; white-space: nowrap; flex: 0 0 auto; }
+.facts, .property-location { color: var(--muted); font-size: .8125rem; line-height: 1.35; }
+.property-location { margin: 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.property-footer-row { min-height: 34px; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.facts { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.compare-control { min-height: 34px; margin: 0; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: .75rem; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; transition: color var(--duration); white-space: nowrap; flex: 0 0 auto; align-self: flex-end; }
 .compare-control:hover, .compare-control.active { color: var(--brand-green); background: transparent; }
 
 .location-section { background: var(--surface-warm); padding-top: var(--space-16) !important; }
@@ -117,6 +120,8 @@ h3 { font-size: 1.05rem; font-weight: 600; }
 .app-copy h2 { color: #F4F1E9; margin: 12px 0 24px; font-size: clamp(2rem, 3vw, 2.625rem); font-weight: 550; letter-spacing: -.035em; }
 .app-copy p { margin-bottom: 25px; color: #cdd7d1; }
 .download-banner h1 { color: #F4F1E9; margin: 12px 0 24px; font-size: clamp(2.5rem, 4.5vw, 4rem); font-weight: 550; letter-spacing: -.045em; }
+.download-platform-status { margin: 0 0 22px; }
+.download-platform-status p { margin: 0 0 6px; color: #F4F1E9; }
 .app-availability { margin: 20px 0 8px; font-size: .88rem; }
 .app-web-link { color: #9ed5ba; }
 
@@ -281,10 +286,6 @@ html[data-resolved-theme="dark"] .brand-mark img, .footer .brand-mark img, .app-
 
 .footer-links a { min-height: 32px; display: flex; align-items: center; }
 
-.header-theme .theme-setting > span, .header-theme .theme-control button span { display: none; }
-
-.header-theme .theme-control { border: 0; background: transparent; padding: 0; }
-
 .footer .theme-control { background: #0B2A22; border-color: #52685E; }
 
 .footer .theme-control button { color: #BAC8C0; }
@@ -363,8 +364,6 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
   .header-inner { gap: var(--space-6); }
   .nav { gap: var(--space-4); }
   .header-app-link { display: none !important; }
-  .header-theme { margin-left: auto; }
-  .header-theme .theme-control button { min-width: 40px; }
   .filter-layout { gap: var(--space-8); }
   .results-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .search-shell { left: var(--space-8); right: var(--space-8); }
@@ -372,7 +371,7 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
 }
 @media (max-width: 1023px) {
   .header { height: 72px; }
-  .nav, .header-theme { display: none; }
+  .nav { display: none; }
   .mobile-actions { margin-left: auto; display: flex; align-items: center; gap: 4px; }
   .mobile-menu-backdrop { position: fixed; z-index: 110; inset: 0; display: flex; justify-content: flex-end; background: #06120D80; }
   .mobile-menu-sheet { width: min(430px,100%); height: 100dvh; overflow-y: auto; overscroll-behavior: contain; padding: 16px 24px 40px; background: var(--surface-raised); }
@@ -381,7 +380,6 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
   .mobile-menu-sheet h2 { margin: 0 0 12px; color: var(--muted); font-size: .6875rem; letter-spacing: .12em; text-transform: uppercase; }
   .mobile-menu-sheet a { min-height: 48px; display: flex; align-items: center; gap: 8px; color: var(--ink); }
   .mobile-menu-sheet a.active { color: var(--brand-green); }
-  .mobile-menu-sheet .theme-setting { margin-top: 12px; }
   .hero-frame { height: 680px; }
   .hero-copy { top: 64px; left: 40px; right: 40px; }
   .search-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px 0; }
@@ -437,9 +435,10 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
   .category-grid { grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: 260px 200px 200px; gap: 12px; }
   .category:first-child { grid-row: auto; grid-column: 1 / -1; }
   .category-copy strong { font-size: 1.375rem; }
-  .property-grid { grid-template-columns: 1fr; gap: 32px; }
+  .property-grid { grid-template-columns: 1fr; gap: 28px; }
+  .property-image { aspect-ratio: 16 / 11; }
   .property-body h3 { font-size: 1rem; }
-  .price { font-size: 1.375rem; }
+  .price { font-size: 1.3rem; }
   .location-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
   .location-card { height: 250px; }
   .location-card > span:last-child { left: 16px; bottom: 16px; font-size: 1rem; }
@@ -472,9 +471,10 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
   .detail-heading { display: block; }
   .detail-heading h1 { font-size: 2rem; }
   .detail-actions { margin-top: 16px; }
-  .detail-gallery { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 88%; grid-template-rows: 320px; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 0; margin-inline: -20px; padding-inline: 20px; }
+  .detail-gallery { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 86%; grid-template-rows: 276px; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 14px; margin-inline: 0; padding-inline: 0; }
   .detail-gallery > :is(div, button), .detail-gallery > :is(div, button):first-child, .gallery-2 > :is(div, button):last-child, .gallery-4 > :is(div, button):last-child { grid-row: auto; scroll-snap-align: start; }
   .gallery-1 { grid-template-columns: none; grid-auto-columns: 100%; padding: 0; }
+  .gallery-open { width: 100%; margin-top: 10px; }
   .detail-layout { grid-template-columns: 1fr; gap: 40px; margin-top: 32px; }
   .detail-price-mobile { display: block; font-size: 1.5rem; margin-bottom: 20px; font-weight: 600; }
   .booking-panel { position: static; scroll-margin-top: 88px; }

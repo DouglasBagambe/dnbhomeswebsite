@@ -17,11 +17,10 @@ export function PropertyCard({ property, compact = false }: { property: Property
       <span className="purpose-badge">{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span>
     </Link>
     <div className="property-body">
-      <div className="property-price-row"><strong className="price">{formatPrice(property.price)}</strong>{property.verificationStatus === "verified" && <span className="verified-mark" title="Verified listing"><BadgeCheck size={17} /> Verified</span>}</div>
+      <div className="property-price-row"><strong className="price">{formatPrice(property.price)}</strong></div>
       <h3><Link href={propertyPath(property)}>{property.title}</Link></h3>
-      <p className="property-location">{locationLabel(property)}</p>
-      {facts && <div className="facts">{facts}</div>}
-      <CompareButton property={property} />
+      <div className="property-meta-row"><p className="property-location">{locationLabel(property)}</p>{property.verificationStatus === "verified" && <span className="verified-mark" title="Verified listing"><BadgeCheck size={14} /> Verified</span>}</div>
+      <div className="property-footer-row"><div className="facts">{facts || " "}</div><CompareButton property={property} /></div>
     </div>
   </article>;
 }
