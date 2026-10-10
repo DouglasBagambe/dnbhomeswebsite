@@ -18,6 +18,7 @@ for(const [width,height] of sizes) for(const theme of ['light','dark']) {
    await page.getByRole('button',{name:'Close filters',exact:true}).click();await expect(filters).toBeHidden();
   }
   if (width >= 1024) {
+   const filters=(await page.locator('#property-filters').boundingBox())!;expect(filters.y).toBeGreaterThanOrEqual(80);expect(filters.y+filters.height).toBeLessThanOrEqual(height);
    await expect.poll(async()=>{const bounds=await stage.boundingBox();return bounds!.y;}).toBeLessThan(260);
    const bounds=(await stage.boundingBox())!;expect(bounds.y+bounds.height).toBeLessThanOrEqual(height+24);
   }
@@ -65,7 +66,7 @@ test('Comparison owns Escape even before its focus transfer and pauses Swipe vid
 });
 test('Swipe mixed media allocates one player; failure and hidden tabs pause safely',async({page})=>{
  await page.goto('/discover?q=media-heavy&mode=swipe');
- const stage=page.locator('.swipe-stage');
+ const stage=page.getByRole('article',{name:'Swipe property discovery'});
  for(let i=0;i<20;i++) await stage.getByRole('button',{name:'Next media',exact:true}).click();
  const video=stage.locator('video'); await expect(video).toHaveCount(1); await expect(video).toHaveAttribute('preload','none');
  await video.evaluate((element:HTMLVideoElement)=>element.play());
@@ -78,7 +79,7 @@ test('Swipe mixed media allocates one player; failure and hidden tabs pause safe
  await stage.getByRole('button',{name:'Next media',exact:true}).click(); await expect(stage.locator('video')).toHaveCount(1);
  await stage.getByRole('button',{name:'Next property',exact:true}).click(); await expect(stage.locator('video')).toHaveCount(0);
  await page.goto('/discover?q=failed-image&mode=swipe'); await expect(stage.getByRole('img',{name:/image unavailable/})).toBeVisible();
- await stage.getByRole('button',{name:'Next media',exact:true}).click(); await expect(stage.locator('img')).toBeVisible();
+ await stage.getByRole('button',{name:'Next media',exact:true}).click(); await expect(stage.locator('img')).toHaveCount(1);await expect.poll(()=>stage.locator('img').evaluate((image:HTMLImageElement)=>image.complete&&image.naturalWidth>0)).toBe(true);
 });
 test('Swipe pointer axes and desktop wheel do not change the query',async({page})=>{
  await page.goto('/discover?mode=swipe&purpose=rent');const stage=page.getByRole('article',{name:'Swipe property discovery'});const media=stage.locator('.swipe-media');await expect(stage).toBeVisible();

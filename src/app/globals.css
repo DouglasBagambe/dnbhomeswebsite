@@ -600,6 +600,7 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
 
 body:has(.is-swipe) .compare-bar { display:none; }
 body:has(.is-swipe) .filters.open { z-index:70; }
+@media (min-width:1024px) { body:has(.is-swipe) .filters { max-height:min(760px,calc(100dvh - 260px)); } }
 .swipe-primary-actions { flex-wrap:wrap; }
 .swipe-primary-actions > button[aria-label="Open comparison"] { flex-basis:100%; min-height:36px; padding:5px 12px; }
 @media(max-width:600px) { .is-swipe { height:calc(100dvh - 64px); bottom:auto; } .swipe-filter-label { display:none; } .swipe-copy { max-height:110px; } }
