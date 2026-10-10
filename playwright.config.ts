@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  testIgnore: "visual.spec.ts",
+  testIgnore: ["visual.spec.ts", "media.spec.ts"],
   fullyParallel: false,
   workers: 1,
   timeout: 60_000,

@@ -86,6 +86,7 @@ export interface PropertyPage {
 }
 
 export interface Booking {
+  statusAccessToken?: string;
   _id: string;
   reference: string;
   property: string;

@@ -7,6 +7,9 @@ const properties=Array.from({length:8},(_,i)=>({
  purpose:i===2?'short_stay':i===3?'sale':'rent',type:i===1?'apartment':'house',price:{amount:i===3?480000000:1500000+i*350000,currency:'UGX',period:i===3?'total':i===2?'night':'month'},
  location:{country:'Uganda',region:'Central',district:'Kampala',area:['Ntinda','Bukoto','Muyenga','Naguru'][i%4],address:'Illustrative location, Kampala'},bedrooms:3,bathrooms:2,size:180,sizeUnit:'sqm',amenities:['Parking','Garden','Security','Water storage'],tags:['test:visual-v2'],media:photos.map(p=>({type:'image',url:`/images/${p}.jpg`,alt:'Illustrative architectural photography'})),cover:{type:'image',url:`/images/${photos[i%5]}.jpg`,alt:'Illustrative architectural photography'},agent:{_id:'507f1f77bcf86cd799439099',name:'Douglas (QA fixture)'},featured:true,verificationStatus:i===0?'verified':'unverified',status:'published',viewCount:i,publishedAt:'2026-10-01T12:00:00Z'
 }));
+const heavy = {...properties[0], _id: '507f1f77bcf86cd799439080', slug: 'media-heavy-qa', title: 'Media-rich family home QA — Kira', verificationStatus: 'unverified', tags: ['qa:media-heavy','preview'],
+  media: [...Array.from({length:20},(_,i)=>({type:'image',url:`/images/${photos[i%photos.length]}.jpg`,alt:`QA image ${i+1}`})), ...Array.from({length:5},(_,i)=>({type:'video',url:`/qa/video-${i+1}.webm`,alt:`Synthetic QA video ${i+1}`}))]};
+const failed = {...properties[0], _id:'507f1f77bcf86cd799439081',slug:'failed-image-qa',title:'Failed image QA',cover:{type:'image',url:'/qa/intentional-missing.jpg',alt:'Long descriptive alternative text must not overflow'},media:[{type:'image',url:'/qa/intentional-missing.jpg',alt:'Failed photo'},properties[0].media[1]]};
 let writes=[];
 http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://127.0.0.1:3100');res.setHeader('Content-Type','application/json');res.setHeader('Access-Control-Allow-Origin','http://127.0.0.1:3101');res.setHeader('Access-Control-Allow-Headers','Content-Type,Idempotency-Key');
@@ -19,14 +22,14 @@ http.createServer(async(req,res)=>{
   return send({data:{id:'local-inquiry'},message:'Your test message has been received.'},201);
  }
  if(u.pathname==='/api/v1/properties'){
-  let data=properties.filter(p=>['purpose','type','area','district'].every(k=>!u.searchParams.get(k)||(p[k]??p.location[k])===u.searchParams.get(k)));
+  let data=(u.searchParams.get('q')==='failed-image'?[failed]:properties).filter(p=>['purpose','type','area','district'].every(k=>!u.searchParams.get(k)||(p[k]??p.location[k])===u.searchParams.get(k)));
   if(u.searchParams.get('q')==='empty')data=[];
   if(u.searchParams.get('verified')==='true')data=data.filter(p=>p.verificationStatus==='verified');
   const sort=u.searchParams.get('sort');if(sort==='price_asc'||sort==='price_desc')data.sort((a,b)=>(a.price.amount-b.price.amount)*(sort==='price_asc'?1:-1));
   const total=data.length,limit=Number(u.searchParams.get('limit')||20),page=Number(u.searchParams.get('page')||1);
   return send({data:data.slice((page-1)*limit,page*limit),pagination:{page,limit,total,pages:Math.ceil(total/limit)}});
  }
- if(u.pathname.startsWith('/api/v1/properties/')){const p=properties.find(p=>p._id===u.pathname.split('/').at(-1));return p?send({data:p}):send({error:{message:'Property not found'}},404);}
+ if(u.pathname.startsWith('/api/v1/properties/')){const p=[...properties,heavy,failed].find(p=>p._id===u.pathname.split('/').at(-1));return p?send({data:p}):send({error:{message:'Property not found'}},404);}
  if(u.pathname==='/api/v1/agents'||u.pathname==='/api/v1/agencies')return send({data:[],pagination:{page:1,limit:50,total:0,pages:0}});
  send({error:{message:'Unknown fixture route'}},404);
 }).listen(3100,'127.0.0.1',()=>console.log('Isolated visual QA API on 127.0.0.1:3100'));

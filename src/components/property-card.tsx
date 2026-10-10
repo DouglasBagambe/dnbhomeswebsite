@@ -1,9 +1,9 @@
-import Image from "next/image";
+import { PropertyImage } from "@/components/property-image";
 import Link from "next/link";
 import { CompareButton } from "@/components/compare-provider";
 import { FavoriteButton } from "@/components/favorite-button";
 import { formatPrice, locationLabel, propertyPath } from "@/lib/format";
-import { bypassImageOptimization, imageFor } from "@/lib/storage";
+import { imageFor } from "@/lib/storage";
 import type { Property } from "@/types/property";
 import { BadgeCheck } from "lucide-react";
 
@@ -13,7 +13,7 @@ export function PropertyCard({ property, compact = false }: { property: Property
   return <article className={`property-card ${compact ? "compact" : ""}`}>
     <FavoriteButton id={property._id} />
     <Link className="property-image" href={propertyPath(property)} aria-label={`View ${property.title}`}>
-      {image ? <Image src={image} alt={property.cover?.alt || property.title} fill unoptimized={bypassImageOptimization(image)} sizes="(max-width: 620px) 100vw, (max-width: 1180px) 50vw, 25vw" /> : <div className="image-placeholder">Homes property</div>}
+      {image ? <PropertyImage key={image} src={image} alt={property.cover?.alt || property.title} fill sizes="(max-width: 620px) 100vw, (max-width: 1180px) 50vw, 25vw" /> : <div className="image-placeholder">Homes property</div>}
       <span className="purpose-badge">{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span>
     </Link>
     <div className="property-body">

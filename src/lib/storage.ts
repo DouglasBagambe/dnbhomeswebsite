@@ -19,6 +19,8 @@ export function toggleId(ids: string[], id: string, limit?: number): string[] {
 }
 
 export interface LocalBooking {
+  id?: string;
+  statusAccessToken?: string;
   propertyId: string;
   propertyTitle: string;
   reference: string;
@@ -32,4 +34,12 @@ export function imageFor(property: Property): string | undefined {
 }
 
 export const bypassImageOptimization = (url: string): boolean =>
-  url.includes("images.unsplash.com") || /^http:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(url);
+  showcaseFiles.has(normalizeShowcaseImage(url)) || url.includes("images.unsplash.com") || /^http:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(url);
+
+const showcaseFiles = new Set([
+  "single-room", "muzigo", "home-setting", "urban-home", "kololo-block", "kololo-apartments", "apartments-home", "entebbe-apartment", "gated-home", "rental-interior", "hotel-building", "mukono-house", "fort-portal-house", "garden", "bweyale-garden", "grassland", "kampala-commercial",
+].map(id => `/images/uganda/showcase/optimized-${id}.jpg`));
+export function normalizeShowcaseImage(value: string): string {
+  try { const url = new URL(value); if (url.protocol === "https:" && url.hostname === "dnbhomeswebsite-psi.vercel.app" && !url.port && !url.username && !url.password && !url.search && !url.hash && showcaseFiles.has(url.pathname)) return url.pathname; } catch { /* relative asset */ }
+  return value;
+}

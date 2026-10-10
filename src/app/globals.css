@@ -174,8 +174,8 @@ h3 { font-size: 1.05rem; font-weight: 600; }
 .detail-favorite { position: relative; width: 48px; height: 48px; }
 .detail-favorite .favorite { position: static; border: 1px solid var(--border-strong); box-shadow: none; }
 .detail-gallery { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: repeat(2, 240px); gap: 8px; overflow: hidden; border-radius: var(--radius-image); background: var(--surface); }
-.detail-gallery > div { position: relative; min-height: 0; overflow: hidden; }
-.detail-gallery > div:first-child { grid-row: 1 / 3; }
+.detail-gallery > :is(div, button) { position: relative; min-height: 0; overflow: hidden; }
+.detail-gallery > :is(div, button):first-child { grid-row: 1 / 3; }
 .detail-gallery img { object-fit: cover; }
 .detail-layout { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(340px,.8fr); gap: var(--space-16); margin-top: var(--space-12); }
 .detail-copy > h2 { margin-top: var(--space-12); margin-bottom: var(--space-6); font-size: 1.75rem; }
@@ -311,11 +311,11 @@ html[data-resolved-theme="dark"] .brand-mark img, .footer .brand-mark img, .app-
 
 .gallery-2 { grid-template-columns: 2fr 1fr; }
 
-.gallery-2 > div:last-child { grid-row: span 2; }
+.gallery-2 > :is(div, button):last-child { grid-row: span 2; }
 
 .gallery-3 { grid-template-columns: 2fr 1fr; }
 
-.gallery-4 > div:last-child { grid-row: span 2; }
+.gallery-4 > :is(div, button):last-child { grid-row: span 2; }
 
 .detail-copy > p { line-height: 1.85; max-width: 760px; white-space: pre-line; color: var(--muted); }
 
@@ -473,7 +473,7 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
   .detail-heading h1 { font-size: 2rem; }
   .detail-actions { margin-top: 16px; }
   .detail-gallery { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 88%; grid-template-rows: 320px; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 0; margin-inline: -20px; padding-inline: 20px; }
-  .detail-gallery > div, .detail-gallery > div:first-child, .gallery-2 > div:last-child, .gallery-4 > div:last-child { grid-row: auto; scroll-snap-align: start; }
+  .detail-gallery > :is(div, button), .detail-gallery > :is(div, button):first-child, .gallery-2 > :is(div, button):last-child, .gallery-4 > :is(div, button):last-child { grid-row: auto; scroll-snap-align: start; }
   .gallery-1 { grid-template-columns: none; grid-auto-columns: 100%; padding: 0; }
   .detail-layout { grid-template-columns: 1fr; gap: 40px; margin-top: 32px; }
   .detail-price-mobile { display: block; font-size: 1.5rem; margin-bottom: 20px; font-weight: 600; }
@@ -514,3 +514,19 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
   .detail-layout { grid-template-columns: 1fr; }
   .booking-panel { position: static; }
 }
+/* Gallery-only hardening: bounded fallback and a single active media player. */
+.detail-gallery > button { position: relative; border: 0; padding: 0; overflow: hidden; background: var(--surface); cursor: zoom-in; min-width: 0; }
+
+.media-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--surface); color: var(--muted); font-size: .9rem; }
+.gallery-open { margin-top: 12px; }
+.media-dialog { width: min(1100px, 96vw); max-width: 96vw; max-height: 94dvh; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--text); }
+.media-dialog::backdrop { background: #000c; }
+.media-dialog-header, .media-dialog-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.media-dialog button { min-height: 44px; }
+.media-stage { position: relative; height: min(60dvh, 650px); margin: 12px 0; background: #111; touch-action: pan-y; }
+.media-stage img { object-fit: contain; }
+.media-stage video { width: 100%; height: 100%; object-fit: contain; }
+.media-index { display: flex; gap: 6px; overflow-x: auto; margin-top: 12px; }
+.media-index button { flex-shrink: 0; min-width: 44px; }
+.media-index [aria-current="true"] { outline: 2px solid var(--accent); }
+@media(max-width:760px) { .media-dialog-controls { font-size: .8rem; } }

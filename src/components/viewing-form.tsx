@@ -15,7 +15,7 @@ export function ViewingForm({ propertyId, propertyTitle }: { propertyId: string;
       const response = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json", "Idempotency-Key": key }, body: JSON.stringify({ ...body, property: propertyId, propertyTitle }) });
       const result = await response.json() as { data?: Booking; error?: { message?: string } };
       if (!response.ok || !result.data) throw new Error(result.error?.message ?? "Unable to send request");
-      const local: LocalBooking = { propertyId, propertyTitle, reference: result.data.reference, scheduledAt: result.data.scheduledAt, status: result.data.status, createdAt: result.data.createdAt ?? new Date().toISOString() };
+      const local: LocalBooking = { id: result.data._id, statusAccessToken: result.data.statusAccessToken, propertyId, propertyTitle, reference: result.data.reference, scheduledAt: result.data.scheduledAt, status: result.data.status, createdAt: result.data.createdAt ?? new Date().toISOString() };
       const current: unknown = JSON.parse(localStorage.getItem(BOOKINGS_KEY) ?? "[]");
       const records = Array.isArray(current) ? current : [];
       localStorage.setItem(BOOKINGS_KEY, JSON.stringify([local, ...records].slice(0, 30)));
