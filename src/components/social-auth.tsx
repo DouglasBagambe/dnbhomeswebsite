@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { config } from "@/lib/config";
-import { accountAction, type AccountCapabilities } from "./consumer-provider";
+import { AccountError, accountAction, type AccountCapabilities } from "./consumer-provider";
 
 type Props = {
   capabilities: AccountCapabilities | null;
@@ -11,11 +11,36 @@ type Props = {
   onError: (message: string) => void;
 };
 
+type GoogleIdentity = {
+  accounts?: {
+    id?: {
+      initialize(options: {
+        client_id: string;
+        callback: (response: { credential?: string }) => void;
+        cancel_on_tap_outside?: boolean;
+      }): void;
+      renderButton(element: HTMLElement, options: Record<string, string | number>): void;
+    };
+  };
+};
+type AppleIdentity = {
+  auth?: {
+    init(options: { clientId: string; scope: string; redirectURI: string; usePopup: boolean }): void;
+    signIn(): Promise<{ authorization?: { id_token?: string } }>;
+  };
+};
 declare global {
   interface Window {
-    google?: any;
-    AppleID?: any;
+    google?: GoogleIdentity;
+    AppleID?: AppleIdentity;
   }
+}
+
+function providerMessage(cause: unknown, provider: "Google" | "Apple") {
+  if (cause instanceof AccountError && /account_not_linked/i.test(cause.code)) {
+    return `This ${provider} email already belongs to a Homes account. Sign in with your existing method, then connect ${provider} from Security.`;
+  }
+  return cause instanceof Error ? cause.message : `${provider} sign-in could not be completed.`;
 }
 
 function loadScript(id: string, src: string) {
@@ -46,57 +71,59 @@ export function SocialAuth({ capabilities, mode = "signin", disabled, onSuccess,
   const appleReady = Boolean(capabilities?.providers.apple && config.appleClientId);
 
   useEffect(() => {
-    if (!googleReady || !googleHost.current) return;
+    if (!googleReady || !googleHost.current || disabled) return;
     let cancelled = false;
     void loadScript("homes-google-identity", "https://accounts.google.com/gsi/client")
       .then(() => {
-        if (cancelled || !googleHost.current || !window.google?.accounts?.id) return;
-        window.google.accounts.id.initialize({
+        const identity = window.google?.accounts?.id;
+        if (cancelled || !googleHost.current || !identity) return;
+        identity.initialize({
           client_id: config.googleClientId,
-          callback: async (response: { credential?: string }) => {
+          callback: async response => {
             try {
               if (!response.credential) throw new Error("Google did not return a valid identity token.");
               await accountAction(action, { provider: "google", idToken: { token: response.credential } });
               await onSuccess();
             } catch (cause) {
-              onError(cause instanceof Error ? cause.message : "Google sign-in could not be completed.");
+              onError(providerMessage(cause, "Google"));
             }
           },
           cancel_on_tap_outside: true,
         });
         googleHost.current.replaceChildren();
-        window.google.accounts.id.renderButton(googleHost.current, {
+        identity.renderButton(googleHost.current, {
           type: "standard",
           theme: document.documentElement.dataset.theme === "dark" ? "filled_black" : "outline",
           size: "large",
           shape: "rectangular",
-          text: mode === "link" ? "continue_with" : "continue_with",
+          text: "continue_with",
           width: Math.min(420, googleHost.current.clientWidth || 420),
         });
       })
-      .catch(cause => onError(cause instanceof Error ? cause.message : "Google sign-in is unavailable."));
+      .catch(cause => onError(providerMessage(cause, "Google")));
     return () => { cancelled = true; };
-  }, [action, googleReady, mode, onError, onSuccess]);
+  }, [action, disabled, googleReady, onError, onSuccess]);
 
   async function apple() {
     if (!appleReady || appleBusy || disabled) return;
     setAppleBusy(true);
     try {
       await loadScript("homes-apple-identity", "https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js");
-      if (!window.AppleID?.auth) throw new Error("Apple sign-in is unavailable.");
-      window.AppleID.auth.init({
+      const appleIdentity = window.AppleID?.auth;
+      if (!appleIdentity) throw new Error("Apple sign-in is unavailable.");
+      appleIdentity.init({
         clientId: config.appleClientId,
         scope: "name email",
         redirectURI: `${window.location.origin}/account`,
         usePopup: true,
       });
-      const result = await window.AppleID.auth.signIn();
-      const token = result?.authorization?.id_token;
+      const result = await appleIdentity.signIn();
+      const token = result.authorization?.id_token;
       if (!token) throw new Error("Apple did not return a valid identity token.");
       await accountAction(action, { provider: "apple", idToken: { token } });
       await onSuccess();
     } catch (cause) {
-      const message = cause instanceof Error ? cause.message : "Apple sign-in could not be completed.";
+      const message = providerMessage(cause, "Apple");
       if (!/popup_closed|cancel/i.test(message)) onError(message);
     } finally {
       setAppleBusy(false);
@@ -107,7 +134,7 @@ export function SocialAuth({ capabilities, mode = "signin", disabled, onSuccess,
   return <div className="social-auth" aria-label={mode === "link" ? "Connect a sign-in method" : "Social sign in"}>
     {googleReady && <div className={disabled ? "social-provider-disabled" : ""} ref={googleHost} aria-disabled={disabled || undefined} />}
     {appleReady && <button type="button" className="social-provider apple" disabled={disabled || appleBusy} onClick={apple}>
-      <span aria-hidden="true">●</span>{appleBusy ? "Connecting…" : mode === "link" ? "Connect Apple" : "Continue with Apple"}
+      {appleBusy ? "Connecting…" : mode === "link" ? "Connect Apple" : "Continue with Apple"}
     </button>}
   </div>;
 }
