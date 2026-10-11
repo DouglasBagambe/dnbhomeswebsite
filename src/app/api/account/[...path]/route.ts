@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { consumerCookie, consumerRequest, publicIdentity, sameOrigin } from "@/lib/consumer-server";
 
-const readPaths = new Set(["me", "state", "viewings"]);
+const readPaths = new Set(["capabilities", "me", "state", "viewings"]);
 const writePaths = new Set(["state", "merge", "preferences"]);
-const authPaths = new Set(["sign-up/email", "sign-in/email", "sign-out", "email-otp/send-verification-otp", "email-otp/verify-email", "email-otp/request-password-reset", "email-otp/reset-password", "email-otp/request-email-change", "email-otp/change-email", "update-user", "change-password", "delete-user", "revoke-sessions", "revoke-other-sessions"]);
+const authReadPaths = new Set(["list-accounts"]);
+const authPaths = new Set(["sign-up/email", "sign-in/email", "sign-in/social", "link-social", "unlink-account", "sign-out", "email-otp/send-verification-otp", "email-otp/verify-email", "email-otp/request-password-reset", "email-otp/reset-password", "email-otp/request-email-change", "email-otp/change-email", "update-user", "change-password", "delete-user", "revoke-sessions", "revoke-other-sessions"]);
 type Context = { params: Promise<{ path: string[] }> };
 async function proxy(request: Request, context: Context) {
   const { path } = await context.params;
   const endpoint = path.join("/");
   const auth = endpoint.startsWith("auth/");
   const action = auth ? endpoint.slice(5) : endpoint;
-  if (request.method === "GET" ? !readPaths.has(endpoint) : auth ? !authPaths.has(action) : !writePaths.has(endpoint)) return NextResponse.json({ error: { message: "Not found" } }, { status: 404 });
+  if (request.method === "GET" ? auth ? !authReadPaths.has(action) : !readPaths.has(endpoint) : auth ? !authPaths.has(action) : !writePaths.has(endpoint)) return NextResponse.json({ error: { message: "Not found" } }, { status: 404 });
   if (request.method !== "GET" && !sameOrigin(request)) return NextResponse.json({ error: { message: "Request origin rejected" } }, { status: 403 });
   const query = new URL(request.url).search;
   let body: string | undefined;
@@ -24,7 +25,13 @@ async function proxy(request: Request, context: Context) {
     const upstream = await consumerRequest(auth ? `/auth/consumer/${action}` : `/consumer/${endpoint}${query}`, { method: request.method, body, headers: request.method === "GET" ? {} : { Origin: request.headers.get("origin")! } });
     const result = await upstream.json().catch(() => null) as Record<string, unknown> | null;
     if (!result) return NextResponse.json({ error: { message: "Accounts are temporarily unavailable. Please retry." } }, { status: 502 });
-    const safe = auth ? upstream.ok ? { data: { success: true, user: result.user && typeof result.user === "object" ? publicIdentity(result.user as Record<string, unknown>) : undefined } } : { error: { message: result.message ?? (result.error as { message?: string } | undefined)?.message ?? "Check your details and try again.", code: result.code } } : result;
+    const safe = auth ? upstream.ok ? {
+      data: {
+        success: true,
+        user: result.user && typeof result.user === "object" ? publicIdentity(result.user as Record<string, unknown>) : undefined,
+        accounts: Array.isArray(result) ? result.map(item => ({ id: String((item as Record<string, unknown>).id ?? ""), providerId: String((item as Record<string, unknown>).providerId ?? "") })) : undefined,
+      },
+    } : { error: { message: result.message ?? (result.error as { message?: string } | undefined)?.message ?? "Check your details and try again.", code: result.code } } : result;
     const response = NextResponse.json(safe, { status: upstream.status, headers: { "Cache-Control": "no-store" } });
     const token = upstream.headers.get("set-auth-token");
     if (token) response.cookies.set(consumerCookie, decodeURIComponent(token), { httpOnly: true, secure: request.headers.get("origin")?.startsWith("https://") === true, sameSite: "lax", path: "/", maxAge: 7 * 86400 });
