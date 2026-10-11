@@ -10,12 +10,12 @@ test('real account ownership, HttpOnly sessions, cross-device Saved/Viewings and
  await page.getByLabel('Full name',{exact:true}).fill('Homes QA Consumer');await page.getByLabel('Phone (optional)').fill('+256700000000');await page.getByLabel('Email',{exact:true}).fill(email);await page.getByLabel('Password',{exact:true}).fill(password);
  await page.getByRole('button',{name:'Create account',exact:true}).click();await expect(page.getByRole('heading',{name:'Check your inbox'})).toBeVisible();
  const verification=await code('email-verification');expect(verification).toMatch(/^\d{6}$/);await page.getByLabel('Six-digit code').fill(verification);await page.getByRole('button',{name:'Verify email',exact:true}).click();
- await expect(page.getByRole('heading',{name:'Welcome, Homes'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Welcome, Homes.'})).toBeVisible();
  await expect.poll(async()=>{const response=await page.request.get('/api/account/state');return response.ok()?(await response.json()).data.saved.length:0;}).toBe(1);
  const cookies=await page.context().cookies();const session=cookies.find(item=>item.name==='homes-consumer-session');expect(session?.httpOnly).toBe(true);expect(session?.sameSite).toBe('Lax');
  expect(await page.evaluate(()=>document.cookie)).not.toContain('homes-consumer-session');expect(await page.evaluate(()=>Object.entries(localStorage).some(([key,value])=>/token|session/i.test(key)&&value.includes('.')))).toBe(false);
  const second=await browser.newContext({baseURL:'http://127.0.0.1:3101',viewport:{width:390,height:844}});const phone=await second.newPage();
- await phone.goto('/account');await phone.getByRole('button',{name:'Sign in with email',exact:true}).click();await phone.getByLabel('Email',{exact:true}).fill(email);await phone.getByLabel('Password',{exact:true}).fill(password);await phone.getByRole('button',{name:'Sign in',exact:true}).click();await expect(phone.getByRole('heading',{name:'Welcome, Homes'})).toBeVisible();
+ await phone.goto('/account');await phone.getByRole('button',{name:'Sign in with email',exact:true}).click();await phone.getByLabel('Email',{exact:true}).fill(email);await phone.getByLabel('Password',{exact:true}).fill(password);await phone.getByRole('button',{name:'Sign in',exact:true}).click();await expect(phone.getByRole('heading',{name:'Welcome, Homes.'})).toBeVisible();
  await phone.goto('/favorites');await expect(phone.locator('.property-card')).toHaveCount(1);
  await phone.goto('/discover?mode=swipe');await phone.getByRole('button',{name:'Request viewing',exact:true}).click();
  const form=phone.locator('dialog[open]');await expect(form.getByLabel('Name',{exact:true})).toHaveCount(0);await expect(form.getByLabel('Email',{exact:true})).toHaveCount(0);await expect(form.getByLabel('Phone',{exact:true})).toHaveCount(0);
