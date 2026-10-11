@@ -56,7 +56,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: DouglasBagambe/dnbhomesbackend
-          ref: d0f27edc66d8b8b4b51af8f81f3f9beb1d97d1f9
+          ref: 86d64fd53aed8e73b645e6cebe101ecf4010c89c
           path: dnbhomesbackend
       - uses: actions/setup-node@v4
         with:
