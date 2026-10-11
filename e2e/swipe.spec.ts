@@ -50,7 +50,7 @@ for(const [width,height] of sizes) for(const theme of ['light','dark']) {
   await expect(page).toHaveURL(/properties/); await page.goBack();
   await expect(page.locator('.swipe-counter')).toContainText('2 /');
   await stage.getByRole('button',{name:'Request viewing',exact:true}).click();
-  await expect(page.locator('dialog[open]').getByLabel('Name',{exact:true})).toBeVisible();
+  await expect(page.locator('dialog[open]').getByLabel('Full name',{exact:true})).toBeVisible();
   await page.locator('dialog[open]').getByRole('button',{name:'Close viewing request'}).click();
   await page.getByRole('button',{name:'Grid',exact:true}).click();
   await expect(page).not.toHaveURL(/mode=swipe/); await expect(page).toHaveURL(/bedrooms=2/);
