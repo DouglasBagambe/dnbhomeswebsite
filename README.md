@@ -118,3 +118,17 @@ QA commands: the ordinary `npx playwright test` covers core routes; `npx playwri
 ### Release associations and privacy
 
 Canonical website origin remains `NEXT_PUBLIC_SITE_URL`. Publish Android associations through `ANDROID_APP_LINK_FINGERPRINTS` (real Play signing SHA-256 certificate fingerprints), and iOS associations through `IOS_APP_LINK_TEAM_ID` (real ten-character Apple team ID). Unconfigured association endpoints return 404 rather than publishing invented identities. Both associate `/properties/*` only. Match the mobile build's `HOMES_WEBSITE_URL`/`HOMES_LINK_HOST` to this origin; the actual Vercel preview can be used until a production domain exists. Privacy and Terms now describe optional accounts, verification/reset processing, synced state and implemented account deletion/anonymization. Account deletion is discoverable on Account; no self-service listing creation is exposed.
+
+### Approved startup brand loader
+
+`src/components/startup-brand-loader.tsx` preserves Douglas's approved vector
+paths, normalized SVG dash drawing, colors and exact 4,080ms sequence. CSS respects
+resolved light/dark theme and reduced motion (completed vectors, 150ms fade).
+There are no demo controls, loops, or animation-library dependencies.
+
+The component is intentionally **not mounted**: the server-rendered Website is
+usable before optional account restoration completes. Blocking that content
+would add an artificial delay. Existing route skeletons and media/account states
+remain unchanged. If a genuine blocking first-entry bootstrap is introduced,
+mount this component only for that boundary and remove/crossfade it immediately
+when ready; never mount it in route loading files or ordinary navigation.

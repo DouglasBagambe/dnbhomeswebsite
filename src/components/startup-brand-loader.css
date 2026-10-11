@@ -1,0 +1,20 @@
+/* Exact approved signature prototype; no loop, navigation, or demo controls. */
+.signature-startup { --bg:#ffffff; --ink:#222222; position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; background:var(--bg); padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px); }
+html[data-resolved-theme="dark"] .signature-startup { --bg:#1f1e20; --ink:#fafafa; }
+.signature-startup svg { width:min(80%,460px); max-height:80%; height:auto; overflow:visible; }
+.signature-ink { fill:none; stroke:var(--ink); stroke-linecap:round; stroke-linejoin:round; }
+.signature-halo { fill:none; stroke:var(--bg); stroke-linecap:round; }
+.signature-dash { stroke-dasharray:1 2; stroke-dashoffset:1.02; }
+.signature-mark { stroke-width:48; animation:signature-draw 1300ms cubic-bezier(.55,.05,.3,1) 100ms forwards; }
+.signature-w { stroke-width:12; animation:signature-draw var(--t) cubic-bezier(.45,0,.3,1) var(--d) forwards; }
+.signature-gaps { opacity:0; animation:signature-show 240ms ease-out 1300ms forwards; }
+.signature-group { transform-origin:512px 588px; animation:signature-settle 380ms ease-out 3700ms both; }
+@keyframes signature-draw { from { stroke-dashoffset:1.02; } to { stroke-dashoffset:0; } }
+@keyframes signature-show { to { opacity:1; } }
+@keyframes signature-settle { from { transform:scale(.994); } to { transform:scale(1); } }
+@media (prefers-reduced-motion:reduce) {
+ .signature-mark,.signature-w { animation:none; stroke-dashoffset:0; }
+ .signature-gaps { animation:none; opacity:1; }
+ .signature-group { animation:signature-rm 150ms ease-out both; }
+ @keyframes signature-rm { from { opacity:0; } to { opacity:1; } }
+}
