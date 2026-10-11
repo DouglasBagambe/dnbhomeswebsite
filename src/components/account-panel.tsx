@@ -102,7 +102,7 @@ export function AccountPanel() {
 
       <div className="account-dashboard">
         <Link href="/favorites"><strong>Saved</strong><span>Your favourites across devices</span></Link>
-        <Link href="/compare"><strong>Compare</strong><span>Keep your shortlist together</span></Link>
+        <Link href="/discover"><strong>Compare</strong><span>Return to Discover to review your shortlist</span></Link>
         <Link href="/bookings"><strong>Viewings</strong><span>Requests and live statuses</span></Link>
       </div>
 
@@ -207,7 +207,7 @@ export function AccountPanel() {
       <SocialAuth capabilities={account.capabilities} disabled={busy} onSuccess={async () => { await account.refresh(true); }} onError={setError} />
       {(account.capabilities?.providers.google || account.capabilities?.providers.apple) && <div className="account-divider"><span>or use email</span></div>}
       <div className="account-welcome">
-        <button className="button" onClick={() => setMode("register")}>Create account with email</button>
+        <button className="button" onClick={() => setMode("register")}>Create account</button>
         <button className="button secondary" onClick={() => setMode("signin")}>Sign in with email</button>
         <Link className="text-link account-guest" href="/discover">Continue as guest</Link>
       </div>
