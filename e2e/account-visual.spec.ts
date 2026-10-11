@@ -1,7 +1,8 @@
 import {test,expect} from '@playwright/test';
 const shots=process.env.HOMES_ACCOUNT_SCREENSHOTS || 'test-results/account-screenshots';
 async function capture(page: import('@playwright/test').Page, path: string) {
- await page.evaluate(()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo(0,0);});
+ await page.evaluate(()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo({top:0,left:0,behavior:'instant'});});
+ await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBe(0);
  await page.screenshot({path,fullPage:true});
 }
 async function checkFormSpacing(page: import('@playwright/test').Page) {
