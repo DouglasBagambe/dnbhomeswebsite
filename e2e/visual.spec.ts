@@ -65,8 +65,8 @@ test("viewing and contact flow use only isolated fixture API",async({page,reques
  const date = new Date(); date.setDate(date.getDate()+7); const day = date.toISOString().slice(0,10);
  await page.goto(property);const form=page.locator("#request-viewing form");
  await form.getByLabel("Preferred date").fill(day);await form.getByLabel("Preferred time (Uganda)").fill("14:30");
- await form.getByLabel("Name",{exact:true}).fill("Local QA");await form.getByLabel("Email",{exact:true}).fill("qa@example.test");await form.getByLabel("Phone",{exact:true}).fill("+256700000001");
- await form.getByRole("button",{name:"Request a viewing",exact:true}).click();await expect(page.getByText("Viewing request received")).toBeVisible();
+ await form.getByLabel("Full name",{exact:true}).fill("Local QA");await form.getByLabel("Email",{exact:true}).fill("qa@example.test");await form.getByLabel("Phone",{exact:true}).fill("+256700000001");
+ await form.getByRole("button",{name:"Request this viewing",exact:true}).click();await expect(page.getByText("Viewing request received")).toBeVisible();
  await page.goto("/bookings");await expect(page.getByText("HOMES-QA-ONLY")).toBeVisible();
  await page.goto("/contact");await page.getByLabel("Name",{exact:true}).fill("Local QA");await page.getByLabel("Email",{exact:true}).fill("qa@example.test");await page.getByLabel("Subject").fill("Local test");await page.getByLabel("Message").fill("This is isolated browser QA.");
  await page.getByRole("button",{name:"Send message"}).click();await expect(page.getByRole("status")).toContainText("test message");
