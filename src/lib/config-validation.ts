@@ -19,5 +19,6 @@ export function validateProductionConfig(values: Values) {
   if (values.NEXT_PUBLIC_ANDROID_APP_URL) checkedUrl(values.NEXT_PUBLIC_ANDROID_APP_URL, "NEXT_PUBLIC_ANDROID_APP_URL");
   if (values.NEXT_PUBLIC_CONTACT_EMAIL && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.NEXT_PUBLIC_CONTACT_EMAIL)) throw new Error("Invalid NEXT_PUBLIC_CONTACT_EMAIL");
   if (values.NEXT_PUBLIC_CONTACT_PHONE && !/^\+[1-9]\d{7,14}$/.test(values.NEXT_PUBLIC_CONTACT_PHONE)) throw new Error("NEXT_PUBLIC_CONTACT_PHONE must use international format");
+  if (values.IOS_APP_LINK_TEAM_ID && !/^[A-Z0-9]{10}$/.test(values.IOS_APP_LINK_TEAM_ID)) throw new Error("IOS_APP_LINK_TEAM_ID must be a real ten-character Apple team ID");
   if (values.ANDROID_APP_LINK_FINGERPRINTS && !values.ANDROID_APP_LINK_FINGERPRINTS.split(",").every((item) => /^([A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}$/.test(item.trim()))) throw new Error("ANDROID_APP_LINK_FINGERPRINTS must contain SHA-256 certificate fingerprints");
 }
