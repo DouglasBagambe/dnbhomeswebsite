@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { config } from "@/lib/config";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RecentHomes } from "./recent-homes";
 import { SocialAuth } from "./social-auth";
@@ -43,7 +44,10 @@ export function AccountPanel() {
   }, [accountUser]);
 
   const hasCredential = useMemo(() => linked.some(item => item.providerId === "credential"), [linked]);
+  const socialReady = Boolean(account?.capabilities?.providers.google && config.googleClientId || account?.capabilities?.providers.apple && config.appleClientId);
   const linkedProviders = useMemo(() => new Set(linked.map(item => item.providerId)), [linked]);
+
+  function changeMode(next: Mode) { setMode(next); setError(""); setMessage(""); }
 
   async function perform(action: () => Promise<void>) {
     if (busy) return;
@@ -62,11 +66,12 @@ export function AccountPanel() {
         setMode("verify");
         setMessage("We sent a six-digit verification code. It expires in 10 minutes.");
       } else if (mode === "signin") {
+        setEmail(String(values.email));
         await accountAction("auth/sign-in/email", values);
         await account?.refresh(true);
       } else if (mode === "verify") {
         await accountAction("auth/email-otp/verify-email", { email, otp: values.otp });
-        await account?.refresh(true);
+        await account?.refresh(true); setMessage("");
       } else if (mode === "forgot") {
         await accountAction("auth/email-otp/request-password-reset", { email: values.email });
         setEmail(String(values.email)); setMode("reset");
@@ -101,7 +106,7 @@ export function AccountPanel() {
 
   if (accountUser) {
     const user = accountUser;
-    return <section className="account-panel">
+    return <section className="account-panel account-signed-in">
       <div className="account-hero">
         <div><span className="eyebrow">Your Homes</span><h1>Welcome, {user.name.split(" ")[0]}.</h1>
           <p className="account-lead">Your saved homes, comparisons, recent activity and viewing requests stay with you across supported Homes devices.</p>
@@ -119,6 +124,7 @@ export function AccountPanel() {
         <Link href="/bookings"><strong>Viewings</strong><span>Requests and live statuses</span></Link>
       </div>
 
+      <div className="account-settings">
       <div className="account-card">
         <div className="account-card-heading"><div><span className="eyebrow">Profile</span><h2>Your details</h2></div></div>
         <form action={form => perform(async () => {
@@ -127,7 +133,7 @@ export function AccountPanel() {
         })}>
           <div className="field"><label htmlFor="profile-name">Full name</label><input id="profile-name" name="name" defaultValue={user.name} autoComplete="name" minLength={2} maxLength={100} required /></div>
           <div className="field"><label htmlFor="profile-email">Verified email</label><input id="profile-email" value={user.email} readOnly type="email" /><span className="muted">Used for account security and viewing communication.</span></div>
-          <div className="field"><label htmlFor="profile-phone">Phone</label><input id="profile-phone" name="phone" defaultValue={user.phone} type="tel" autoComplete="tel" maxLength={30} placeholder="+256…" /><span className="muted">We can reuse this when you request a viewing.</span></div>
+          <div className="field"><label htmlFor="profile-phone">Phone (optional)</label><input id="profile-phone" name="phone" defaultValue={user.phone} type="tel" autoComplete="tel" maxLength={30} placeholder="+256…" /><span className="muted">We can reuse this when you request a viewing.</span></div>
           <button className="button" disabled={busy}>Save details</button>
         </form>
       </div>
@@ -182,6 +188,7 @@ export function AccountPanel() {
         </form>
       </div>
 
+      </div>
       <RecentHomes />
 
       <div className="account-card account-danger">
@@ -202,43 +209,45 @@ export function AccountPanel() {
     </section>;
   }
 
-  return <section className="account-panel">
+  return <section className="account-panel account-entry">
+    <div className="account-intro">
     <span className="eyebrow">Your Homes</span>
-    <h1>{({ welcome: "Keep your place with you.", register: "Create your Homes account.", signin: "Welcome back.", verify: "Check your inbox.", forgot: "Reset your password.", reset: "Choose a new password." })[mode]}</h1>
-    <p className="account-lead">Browse without signing in. Create an account when you want Saved homes, Compare, recent activity and viewing requests to follow you across devices.</p>
+    <h1>{({ welcome: "Let's find you a home.", register: "Create your Homes account.", signin: "Welcome back.", verify: "Check your inbox.", forgot: "Reset your password.", reset: "Choose a new password." })[mode]}</h1>
+    <p className="account-lead">{mode === "welcome" ? "A little less searching. A clearer way home." : mode === "register" ? "Just the essentials to make Homes yours. Add a phone number when you need a viewing." : mode === "signin" ? "Your saved places and next steps, right where you left them." : "A secure next step for your Homes account."}</p>
+    <ul className="account-benefit-list" aria-label="Account benefits">
+      <li><span><strong>Save once</strong> · Homes across your devices</span></li><li><span><strong>Compare anywhere</strong> · Keep your shortlist together</span></li><li><span><strong>Manage viewings</strong> · Continue where you left off</span></li>
+    </ul>
+    </div>
+    <div className="account-entry-actions">
 
     {error && <p role="alert" className="account-error">{error}</p>}
     {message && <p role="status" className="account-success">{message}</p>}
     {account.feedback && <p role="status" className="account-note">{account.feedback}</p>}
 
     {mode === "welcome" ? <>
-      <div className="account-benefits">
-        <div><strong>Save once</strong><span>See favourites on web and mobile.</span></div>
-        <div><strong>Compare anywhere</strong><span>Your shortlist stays in sync.</span></div>
-        <div><strong>Manage viewings</strong><span>Keep requests and statuses together.</span></div>
-      </div>
       <SocialAuth capabilities={account.capabilities} disabled={busy} onSuccess={async () => { await account.refresh(true); }} onError={setError} />
-      {(account.capabilities?.providers.google || account.capabilities?.providers.apple) && <div className="account-divider"><span>or use email</span></div>}
+      {socialReady && <div className="account-divider"><span>or use email</span></div>}
       <div className="account-welcome">
-        <button className="button" onClick={() => setMode("register")}>Create account</button>
-        <button className="button secondary" onClick={() => setMode("signin")}>Sign in with email</button>
+        <button className="button" onClick={() => changeMode("register")}>Create account</button>
+        <button className="button secondary" onClick={() => changeMode("signin")}>Sign in with email</button>
         <Link className="text-link account-guest" href="/discover">Continue as guest</Link>
       </div>
     </> : <>
       <form action={submit}>
         {mode === "register" && <div className="field"><label htmlFor="account-name">Full name</label><input id="account-name" name="name" autoComplete="name" minLength={2} maxLength={100} required /></div>}
-        {mode === "register" && <div className="field"><label htmlFor="account-phone">Phone <span className="muted">(optional)</span></label><input id="account-phone" name="phone" autoComplete="tel" type="tel" maxLength={30} placeholder="+256…" /><span className="muted">You can add this later when requesting a viewing.</span></div>}
         {["register", "signin", "forgot"].includes(mode) && <div className="field"><label htmlFor="account-email">Email</label><input id="account-email" name="email" type="email" autoComplete="email" defaultValue={email} required maxLength={254} /></div>}
         {["register", "signin", "reset"].includes(mode) && <div className="field"><label htmlFor="account-password">{mode === "reset" ? "New password" : "Password"}</label><input id="account-password" name="password" type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} minLength={mode === "signin" ? 1 : 12} maxLength={128} required />{mode !== "signin" && <span className="muted">Use at least 12 characters. A memorable passphrase works well.</span>}</div>}
+        {mode === "verify" && <div className="field"><label htmlFor="verification-email">Email</label><input id="verification-email" name="email" type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required maxLength={254} /></div>}
         {["verify", "reset"].includes(mode) && <><p className="muted">Enter the six-digit code sent to {email}. It expires in 10 minutes.</p><div className="field"><label htmlFor="account-code">Six-digit code</label><input id="account-code" name="otp" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required /></div></>}
         <button className="button" disabled={busy}>{busy ? "Please wait…" : ({ register: "Create account", signin: "Sign in", verify: "Verify email", forgot: "Send reset code", reset: "Update password", welcome: "Continue" })[mode]}</button>
       </form>
       <div className="account-shortcuts">
-        {mode === "signin" && <><button className="text-link" onClick={() => setMode("forgot")}>Forgot password?</button><button className="text-link" onClick={() => { setMode("verify"); setMessage("Enter your email if you still need to verify it."); }}>Verify your email</button></>}
+        {mode === "signin" && <><button className="text-link" onClick={() => changeMode("forgot")}>Forgot password?</button><button className="text-link" onClick={() => { changeMode("verify"); }}>Verify your email</button></>}
         {mode === "verify" && <button className="text-link" disabled={busy || !email.includes("@")} onClick={() => perform(async () => { await accountAction("auth/email-otp/send-verification-otp", { email, type: "email-verification" }); setMessage("If your account needs verification, a fresh code is on its way."); })}>Send another code</button>}
-        <button className="text-link" disabled={busy} onClick={() => { setMode(mode === "signin" ? "register" : "signin"); setError(""); }}>{mode === "signin" ? "Create account" : "Back to sign in"}</button>
+        <button className="text-link" disabled={busy} onClick={() => { changeMode(mode === "signin" ? "register" : "signin"); }}>{mode === "signin" ? "Create account" : "Back to sign in"}</button>
         <Link className="text-link" href="/discover">Continue as guest</Link>
       </div>
     </>}
+    </div>
   </section>;
 }

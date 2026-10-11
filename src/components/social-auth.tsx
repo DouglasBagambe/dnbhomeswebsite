@@ -1,6 +1,9 @@
 "use client";
+import Image from "next/image";
+import { AppleMark } from "./provider-marks";
 import { useEffect, useRef, useState } from "react";
 import { config } from "@/lib/config";
+import { isPreviewProvider } from "@/lib/provider-preview";
 import { AccountError, accountAction, type AccountCapabilities } from "./consumer-provider";
 
 type Props = {
@@ -65,13 +68,17 @@ function loadScript(id: string, src: string) {
 
 export function SocialAuth({ capabilities, mode = "signin", disabled, onSuccess, onError }: Props) {
   const googleHost = useRef<HTMLDivElement>(null);
+  const [googleLoaded, setGoogleLoaded] = useState(false);
   const [appleBusy, setAppleBusy] = useState(false);
+  const [previewMessage, setPreviewMessage] = useState("");
+  const googlePreview = isPreviewProvider(config.googleClientId, config.siteUrl);
+  const applePreview = isPreviewProvider(config.appleClientId, config.siteUrl);
   const action = mode === "link" ? "auth/link-social" : "auth/sign-in/social";
   const googleReady = Boolean(capabilities?.providers.google && config.googleClientId);
   const appleReady = Boolean(capabilities?.providers.apple && config.appleClientId);
 
   useEffect(() => {
-    if (!googleReady || !googleHost.current || disabled) return;
+    if (!googleReady || googlePreview || !googleHost.current || disabled) return;
     let cancelled = false;
     void loadScript("homes-google-identity", "https://accounts.google.com/gsi/client")
       .then(() => {
@@ -92,20 +99,21 @@ export function SocialAuth({ capabilities, mode = "signin", disabled, onSuccess,
         });
         googleHost.current.replaceChildren();
         identity.renderButton(googleHost.current, {
-          type: "standard",
-          theme: document.documentElement.dataset.theme === "dark" ? "filled_black" : "outline",
+          type: "icon",
+          theme: document.documentElement.dataset.resolvedTheme === "dark" ? "filled_black" : "outline",
           size: "large",
-          shape: "rectangular",
+          shape: "circle",
           text: "continue_with",
-          width: Math.min(420, googleHost.current.clientWidth || 420),
         });
+        setGoogleLoaded(true);
       })
       .catch(cause => onError(providerMessage(cause, "Google")));
     return () => { cancelled = true; };
-  }, [action, disabled, googleReady, onError, onSuccess]);
+  }, [action, disabled, googlePreview, googleReady, onError, onSuccess]);
 
   async function apple() {
     if (!appleReady || appleBusy || disabled) return;
+    if (applePreview) { setPreviewMessage("Apple sign-in will be available at launch."); return; }
     setAppleBusy(true);
     try {
       await loadScript("homes-apple-identity", "https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js");
@@ -131,10 +139,22 @@ export function SocialAuth({ capabilities, mode = "signin", disabled, onSuccess,
   }
 
   if (!googleReady && !appleReady) return null;
-  return <div className="social-auth" aria-label={mode === "link" ? "Connect a sign-in method" : "Social sign in"}>
-    {googleReady && <div className={disabled ? "social-provider-disabled" : ""} ref={googleHost} aria-disabled={disabled || undefined} />}
-    {appleReady && <button type="button" className="social-provider apple" disabled={disabled || appleBusy} onClick={apple}>
-      {appleBusy ? "Connecting…" : mode === "link" ? "Connect Apple" : "Continue with Apple"}
-    </button>}
+  const googleLabel = mode === "link" ? "Connect Google" : "Continue with Google";
+  const appleLabel = mode === "link" ? "Connect Apple" : "Continue with Apple";
+  const googleMark = <Image src="/assets/brand/google-sign-in.png" alt="" width={24} height={24} unoptimized />;
+  return <div className="social-auth social-auth-icons" aria-label={mode === "link" ? "Connect a sign-in method" : "Social sign in"}>
+    <p className="social-caption">{mode === "link" ? "Connect with" : "Continue with"}</p>
+    <div className="provider-icon-row">
+      {googleReady && <div className="provider-option">
+        {googlePreview ? <button type="button" className="provider-icon google" aria-label={googleLabel} title={googleLabel} disabled={disabled} onClick={() => setPreviewMessage("Google sign-in will be available at launch.")}>{googleMark}</button>
+          : <div className="provider-sdk-slot"><div ref={googleHost} aria-disabled={disabled || undefined} />{!googleLoaded && <span className="provider-loading-mark" aria-label="Google sign-in is loading">{googleMark}</span>}</div>}
+        <span className="provider-name" aria-hidden="true">Google</span>
+      </div>}
+      {appleReady && <div className="provider-option">
+        <button type="button" className="provider-icon apple" aria-label={appleBusy ? "Connecting Apple" : appleLabel} title={appleLabel} disabled={disabled || appleBusy} onClick={apple}><AppleMark /></button>
+        <span className="provider-name" aria-hidden="true">Apple</span>
+      </div>}
+    </div>
+    {previewMessage && <p className="provider-preview-note" role="status">{previewMessage}</p>}
   </div>;
 }

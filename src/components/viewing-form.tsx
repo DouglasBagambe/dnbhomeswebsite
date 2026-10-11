@@ -56,11 +56,10 @@ export function ViewingForm({ propertyId, propertyTitle }: { propertyId: string;
 
     {profile ? <div className="viewing-identity">
       <div className="viewing-identity-copy">
-        <span className="eyebrow">Requesting as</span>
-        <strong>{profile.name}</strong>
+        <strong>Requesting as {profile.name.split(" ")[0]}</strong>
         <span>{profile.email}{profile.phone ? ` · ${profile.phone}` : ""}</span>
       </div>
-      <Link className="text-link" href="/account">Edit contact details</Link>
+      <Link className="text-link" href="/account">Edit contact</Link>
     </div> : <div className="viewing-guest-note">
       <strong>Contact details</strong>
       <span>We need these to coordinate this viewing and its status.</span>

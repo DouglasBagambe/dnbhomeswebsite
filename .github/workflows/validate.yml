@@ -49,6 +49,8 @@ jobs:
       HOMES_BUILD_PROFILE: local
       NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:3100/api/v1
       NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3101
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: 123456789012-previewhomes.apps.googleusercontent.com
+      NEXT_PUBLIC_APPLE_CLIENT_ID: com.nilebitlabs.dnbhomes.preview.web
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,7 +79,7 @@ jobs:
         run: npx playwright test --config playwright.accounts.config.ts
         working-directory: dnbhomeswebsite
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
           name: homes-account-qa
           path: dnbhomeswebsite/test-results

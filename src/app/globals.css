@@ -697,3 +697,60 @@ body:has(.is-swipe) .filters.open { z-index:70; }
   .viewing-time-grid { grid-template-columns: 1fr; }
   .viewing-identity { align-items: flex-start; flex-direction: column; }
 }
+
+/* Account entry and personal workspace; scoped away from discovery. */
+.account-page { min-height:calc(100svh - 88px); padding-block: clamp(28px,5vw,64px); }
+.account-panel { max-width: 1040px; }
+.account-entry { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,400px); gap:clamp(32px,7vw,88px); align-items:start; padding-block:24px; }
+.account-entry h1 { font-size:clamp(2rem,4vw,3rem); max-width:13ch; margin-top:14px; }
+.account-entry-actions { border-left:1px solid var(--border); padding-left:32px; min-width:0; }
+.account-entry-actions form { margin:0; }
+.account-entry-actions .social-auth { margin:0; }
+.account-entry-actions .account-divider { margin:20px 0; }
+.account-entry-actions .account-welcome { margin:0; }
+.account-entry-actions .button { width:100%; min-height:50px; }
+.account-benefit-list { list-style:none; padding:0; margin:24px 0 0; display:grid; gap:12px; color:var(--muted); font-size:.9rem; }
+.account-benefit-list li { display:flex; gap:12px; align-items:baseline; }
+.account-benefit-list li::before { content:""; width:5px; height:5px; flex:none; border-radius:50%; background:var(--brand-green); }
+.account-settings { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; align-items:start; }
+.account-settings .account-card { margin:0; }
+.account-settings .account-card:last-child { grid-column:1/-1; }
+.account-signed-in h1 { font-size:clamp(2rem,4vw,3rem); max-width:none; }
+.account-dashboard a { min-height:90px; border-radius:14px; }
+.account-panel .account-card { border-radius:16px; }
+.account-panel .field input { min-width:0; }
+.account-panel .linked-method { flex-wrap:wrap; }
+.account-panel .account-danger { background:transparent; }
+@media(max-width:767px) {
+ .account-entry { grid-template-columns:1fr; gap:28px; padding-block:0; }
+ .account-entry-actions { border-left:0; border-top:1px solid var(--border); padding:24px 0 0; }
+ .account-entry h1 { max-width:16ch; }
+ .account-benefit-list { grid-template-columns:1fr; gap:9px; font-size:.82rem; }
+ .account-settings { grid-template-columns:1fr; gap:16px; }
+ .account-dashboard { gap:8px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .account-dashboard a { min-height:88px; padding:12px; }
+ .account-dashboard span { font-size:.75rem; }
+ .account-state { padding-block:24px; }
+}
+
+.account-entry .social-auth > div { min-height:48px; }
+.account-entry .social-provider,.account-entry .account-welcome .button { min-height:48px; }
+.social-provider.google { background:var(--surface); border-color:var(--border); color:var(--ink); }
+.provider-preview-note { margin:0; padding:10px 12px; font-size:.85rem; line-height:1.5; color:var(--muted); background:var(--surface-raised); border-radius:10px; }
+.account-benefit-list strong { color:var(--ink); font-weight:600; }
+
+.account-panel button.text-link { border:0; background:none; padding:0; font:inherit; color:var(--brand-green); cursor:pointer; text-align:left; }
+.account-panel button.text-link:hover { text-decoration:underline; }
+.account-panel button.text-link:disabled { cursor:wait; opacity:.6; }
+
+.social-auth-icons .social-caption { margin:0 0 4px; color:var(--muted); font-size:.82rem; text-align:center; }
+.social-auth-icons .provider-icon-row { display:flex; gap:24px; justify-content:center; width:100%; min-height:80px; }
+.social-auth-icons .provider-option { display:grid; justify-items:center; gap:7px; width:64px; }
+.provider-icon { display:grid; place-items:center; width:56px; height:56px; border-radius:50%; border:1px solid var(--border); background:#fff; cursor:pointer; transition:transform .15s ease,box-shadow .15s ease; }
+.provider-icon:hover { transform:translateY(-2px); box-shadow:0 5px 16px #00000014; }
+.provider-icon:disabled { opacity:.55; cursor:wait; }
+.provider-icon.apple { color:var(--ink); background:var(--surface); }
+.provider-name { font-size:.75rem; color:var(--muted); }
+.provider-sdk-slot { position:relative; display:grid; place-items:center; width:56px; height:56px; }
+.provider-sdk-slot > div { display:flex; align-items:center; justify-content:center; width:56px; height:56px; }
+.provider-loading-mark { position:absolute; inset:0; display:grid; place-items:center; border:1px solid var(--border); border-radius:50%; background:var(--surface); pointer-events:none; }
