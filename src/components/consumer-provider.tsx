@@ -5,15 +5,25 @@ import { config } from "@/lib/config";
 import type { Property } from "@/types/property";
 
 export interface Consumer { id: string; name: string; email: string; phone: string; emailVerified: boolean; }
+export interface AccountCapabilities { accounts: boolean; providers: { google: boolean; apple: boolean }; sync: { saved: boolean; compare: boolean; recent: boolean; viewings: boolean; profile: boolean }; }
 interface SyncedState { saved: string[]; compare: string[]; recent: string[]; notifications: { viewingUpdates: boolean; searchAlerts: boolean }; }
-interface ConsumerContextValue { user: Consumer | null; loading: boolean; feedback: string; refresh: (force?: boolean) => Promise<void>; recordRecent: (id: string) => void; notifications: SyncedState["notifications"]; recent: string[]; signOut: (all?: boolean) => Promise<void>; viewings: LocalBooking[]; hasMoreViewings: boolean; refreshViewings: (append?: boolean) => Promise<void>; }
+interface ConsumerContextValue { user: Consumer | null; loading: boolean; feedback: string; capabilities: AccountCapabilities | null; refresh: (force?: boolean) => Promise<void>; recordRecent: (id: string) => void; notifications: SyncedState["notifications"]; recent: string[]; signOut: (all?: boolean) => Promise<void>; viewings: LocalBooking[]; hasMoreViewings: boolean; refreshViewings: (append?: boolean) => Promise<void>; }
 const ConsumerContext = createContext<ConsumerContextValue | null>(null);
 export const useConsumer = () => useContext(ConsumerContext);
 
+export class AccountError extends Error {
+  constructor(message: string, readonly code = "") { super(message); }
+}
 export async function accountAction(action: string, body: Record<string, unknown> = {}) {
   const response = await fetch(`/api/account/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error?.message ?? "Unable to complete your request. Please retry.");
+  if (!response.ok) throw new AccountError(result.error?.message ?? "Unable to complete your request. Please retry.", result.error?.code ?? "");
+  return result;
+}
+export async function accountRead(action: string) {
+  const response = await fetch(`/api/account/${action}`, { cache: "no-store", signal: AbortSignal.timeout(15000) });
+  const result = await response.json();
+  if (!response.ok) throw new AccountError(result.error?.message ?? "Unable to complete your request. Please retry.", result.error?.code ?? "");
   return result;
 }
 function readCompareIds(): string[] {
@@ -23,6 +33,7 @@ export function ConsumerProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Consumer | null>(null);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState("");
+  const [capabilities, setCapabilities] = useState<AccountCapabilities | null>(null);
   const [viewings, setViewings] = useState<LocalBooking[]>([]);
   const viewingPage = useRef(0);
   const [hasMoreViewings, setHasMoreViewings] = useState(false);
@@ -88,6 +99,16 @@ export function ConsumerProvider({ children }: { children: React.ReactNode }) {
   const runRefresh = useCallback(async () => {
     const generation = epoch.current;
     try {
+      const capabilityResponse = await fetch("/api/account/capabilities", { cache: "no-store", signal: AbortSignal.timeout(10000) });
+      if (!capabilityResponse.ok) throw new Error("Account service is temporarily unreachable. You can continue as a guest.");
+      const capabilityPayload = await capabilityResponse.json() as { data: AccountCapabilities };
+      if (generation !== epoch.current) return;
+      setCapabilities(capabilityPayload.data);
+      if (!capabilityPayload.data.accounts) {
+        setFeedback("");
+        setLoading(false);
+        return;
+      }
       const response = await fetch("/api/account/me", { cache: "no-store", signal: AbortSignal.timeout(15000) });
       if (generation !== epoch.current) return;
       if (response.status === 401) {
@@ -180,5 +201,5 @@ export function ConsumerProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener("homes:favorites", saved); window.addEventListener("homes:compare", compare);
     return () => { window.removeEventListener("homes:favorites", saved); window.removeEventListener("homes:compare", compare); };
   }, [flush]);
-  return <ConsumerContext.Provider value={{ user, loading, feedback, refresh, signOut, viewings, hasMoreViewings, refreshViewings, recordRecent, notifications, recent }}>{children}</ConsumerContext.Provider>;
+  return <ConsumerContext.Provider value={{ user, loading, feedback, capabilities, refresh, signOut, viewings, hasMoreViewings, refreshViewings, recordRecent, notifications, recent }}>{children}</ConsumerContext.Provider>;
 }
