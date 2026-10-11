@@ -14,6 +14,8 @@ export const config = {
   ),
   mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "",
   androidAppUrl: process.env.NEXT_PUBLIC_ANDROID_APP_URL ?? "",
-  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "",
-  contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "",
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "douglasbagambe4@gmail.com",
+  contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+256747877740",
+  googleClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "",
+  appleClientId: process.env.NEXT_PUBLIC_APPLE_CLIENT_ID ?? "",
 } as const;
