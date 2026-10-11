@@ -18,16 +18,28 @@ export function AccountPanel() {
   const [linked, setLinked] = useState<LinkedAccount[]>([]);
 
   const loadLinked = useCallback(async () => {
-    if (!account?.user) { setLinked([]); return; }
+    if (!account.user) return [];
     try {
       const result = await accountRead("auth/list-accounts");
-      setLinked((result.data?.accounts ?? []).filter((item: LinkedAccount) => item.id && item.providerId));
+      const items = (result.data?.accounts ?? []).filter((item: LinkedAccount) => item.id && item.providerId);
+      setLinked(items);
+      return items;
     } catch {
       setLinked([]);
+      return [];
     }
-  }, [account?.user]);
+  }, [account.user]);
 
-  useEffect(() => { void loadLinked(); }, [loadLinked]);
+  useEffect(() => {
+    let cancelled = false;
+    if (!account.user) return;
+    void accountRead("auth/list-accounts").then(result => {
+      if (!cancelled) setLinked((result.data?.accounts ?? []).filter((item: LinkedAccount) => item.id && item.providerId));
+    }).catch(() => {
+      if (!cancelled) setLinked([]);
+    });
+    return () => { cancelled = true; };
+  }, [account.user]);
 
   const hasCredential = useMemo(() => linked.some(item => item.providerId === "credential"), [linked]);
   const linkedProviders = useMemo(() => new Set(linked.map(item => item.providerId)), [linked]);
@@ -50,10 +62,10 @@ export function AccountPanel() {
         setMessage("We sent a six-digit verification code. It expires in 10 minutes.");
       } else if (mode === "signin") {
         await accountAction("auth/sign-in/email", values);
-        await account?.refresh(true);
+        await account.refresh(true);
       } else if (mode === "verify") {
         await accountAction("auth/email-otp/verify-email", { email, otp: values.otp });
-        await account?.refresh(true);
+        await account.refresh(true);
       } else if (mode === "forgot") {
         await accountAction("auth/email-otp/request-password-reset", { email: values.email });
         setEmail(String(values.email)); setMode("reset");
@@ -65,7 +77,7 @@ export function AccountPanel() {
     });
   }
 
-  if (account?.loading) {
+  if (!account || account.loading) {
     return <section className="account-panel account-state" aria-live="polite">
       <span className="eyebrow">Your Homes</span>
       <h1>Getting things ready.</h1>
@@ -73,7 +85,7 @@ export function AccountPanel() {
     </section>;
   }
 
-  if (account?.capabilities && !account.capabilities.accounts) {
+  if (account.capabilities && !account.capabilities.accounts) {
     return <section className="account-panel account-state">
       <span className="eyebrow">Your Homes</span>
       <h1>Accounts are coming soon.</h1>
@@ -86,7 +98,7 @@ export function AccountPanel() {
     </section>;
   }
 
-  if (account?.user) {
+  if (account.user) {
     const user = account.user;
     return <section className="account-panel">
       <div className="account-hero">
@@ -196,7 +208,7 @@ export function AccountPanel() {
 
     {error && <p role="alert" className="account-error">{error}</p>}
     {message && <p role="status" className="account-success">{message}</p>}
-    {account?.feedback && <p role="status" className="account-note">{account.feedback}</p>}
+    {account.feedback && <p role="status" className="account-note">{account.feedback}</p>}
 
     {mode === "welcome" ? <>
       <div className="account-benefits">
