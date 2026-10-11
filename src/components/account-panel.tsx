@@ -233,7 +233,7 @@ export function AccountPanel() {
         <Link className="text-link account-guest" href="/discover">Continue as guest</Link>
       </div>
     </> : <>
-      <form action={submit}>
+      <form onSubmit={event => { event.preventDefault(); void submit(new FormData(event.currentTarget)); }}>
         {mode === "register" && <div className="field"><label htmlFor="account-name">Full name</label><input id="account-name" name="name" autoComplete="name" minLength={2} maxLength={100} required /></div>}
         {["register", "signin", "forgot"].includes(mode) && <div className="field"><label htmlFor="account-email">Email</label><input id="account-email" name="email" type="email" autoComplete="email" defaultValue={email} required maxLength={254} /></div>}
         {["register", "signin", "reset"].includes(mode) && <div className="field"><label htmlFor="account-password">{mode === "reset" ? "New password" : "Password"}</label><input id="account-password" name="password" type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} minLength={mode === "signin" ? 1 : 12} maxLength={128} required />{mode !== "signin" && <span className="muted">Use at least 12 characters. A memorable passphrase works well.</span>}</div>}

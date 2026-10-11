@@ -591,7 +591,9 @@ body, .header, .card, .search-box, .field input, .field select, .field textarea 
 .account-panel { max-width:540px; margin:0 auto; }
 .account-panel h1 { font-size:clamp(2rem,5vw,3rem); }
 .account-panel h2 { font-size:1.35rem; }
-.account-panel form { margin:28px 0; }
+.account-panel form { display:grid; gap:18px; margin:28px 0; }
+.account-panel form > p { margin:0; }
+.account-panel .field .muted { font-size:.82rem; line-height:1.5; }
 .account-welcome { display:flex; flex-direction:column; gap:14px; margin-top:30px; }
 .account-shortcuts { display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin:22px 0; }
 .account-error { color:var(--danger); }

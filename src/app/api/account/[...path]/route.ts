@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { consumerCookie, consumerRequest, publicIdentity, sameOrigin } from "@/lib/consumer-server";
+import { accountRetry } from "@/lib/account-retry";
 
 const readPaths = new Set(["capabilities", "me", "state", "viewings"]);
 const writePaths = new Set(["state", "merge", "preferences"]);
@@ -25,7 +26,8 @@ async function proxy(request: Request, context: Context) {
     const upstream = await consumerRequest(auth ? `/auth/consumer/${action}` : `/consumer/${endpoint}${query}`, { method: request.method, body, headers: request.method === "GET" ? {} : { Origin: request.headers.get("origin")! } });
     const result = await upstream.json().catch(() => null) as Record<string, unknown> | null;
     if (!result) return NextResponse.json({ error: { message: "Accounts are temporarily unavailable. Please retry." } }, { status: 502 });
-    const safe = auth ? upstream.ok ? {
+    const retry = upstream.status === 429 ? accountRetry(upstream.headers.get("retry-after")) : undefined;
+    const safe = retry ? { error: { code: "RATE_LIMITED", message: retry.message } } : auth ? upstream.ok ? {
       data: {
         success: true,
         user: result.user && typeof result.user === "object" ? publicIdentity(result.user as Record<string, unknown>) : undefined,
@@ -33,6 +35,7 @@ async function proxy(request: Request, context: Context) {
       },
     } : { error: { message: result.message ?? (result.error as { message?: string } | undefined)?.message ?? "Check your details and try again.", code: result.code } } : result;
     const response = NextResponse.json(safe, { status: upstream.status, headers: { "Cache-Control": "no-store" } });
+    if (retry?.retryAfter) response.headers.set("Retry-After", retry.retryAfter);
     const token = upstream.headers.get("set-auth-token");
     if (token) response.cookies.set(consumerCookie, decodeURIComponent(token), { httpOnly: true, secure: request.headers.get("origin")?.startsWith("https://") === true, sameSite: "lax", path: "/", maxAge: 7 * 86400 });
     if (upstream.status === 401 || ["sign-out", "delete-user", "revoke-sessions"].includes(action) && upstream.ok) response.cookies.delete(consumerCookie);
