@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useConsumer } from "./consumer-provider";
 import { Brand } from "@/components/brand";
 
-const propertyLinks = [["Rent", "/rent"], ["Buy", "/buy"], ["Short Stay", "/short-stay"], ["Land", "/land"], ["Commercial", "/commercial"], ["Discover", "/discover"], ["Tours", "/tours"]] as const;
+const propertyLinks = [["Rent", "/rent"], ["Buy", "/buy"], ["Short Stay", "/short-stay"], ["Land", "/land"], ["Commercial", "/commercial"], ["Discover", "/discover"], ["Reels", "/reels"]] as const;
 
 export function Header() {
   const pathname = usePathname();
@@ -55,7 +55,7 @@ export function Header() {
     </nav>
     <div className="mobile-actions">
       <Link className="header-icon header-search-link" href="/discover" aria-label="Search homes"><Search size={20} /></Link>
-      <Link className="header-icon" href="/tours" aria-label="Watch property Tours"><Clapperboard size={20} /></Link>
+      <Link className="header-icon" href="/reels" aria-label="Watch property videos"><Clapperboard size={20} /></Link>
       <Link className={`header-icon mobile-saved ${active("/favorites") ? "active" : ""}`} href="/favorites" aria-label="Saved homes" aria-current={active("/favorites") ? "page" : undefined}><Heart size={20} /></Link>
       <button ref={menuButton} className="header-icon menu-trigger" type="button" aria-label="Open navigation" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)}><Menu size={22} /></button>
     </div>

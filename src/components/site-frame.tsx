@@ -9,7 +9,7 @@ export interface TourSession extends ToursPage { index: number; mediaPositions: 
 const ToursSessions = createContext<Map<string, TourSession> | null>(null);
 export function useToursSessions() { return useContext(ToursSessions); }
 export function SiteFrame({ children }: { children: ReactNode }) {
-  const tours = usePathname() === "/tours";
+  const tours = usePathname() === "/reels";
   const [sessions] = useState(() => new Map<string, TourSession>());
   return <ToursSessions.Provider value={sessions}><ThemeSync />{!tours && <Header />}<main id="main" className={tours ? "tours-main" : undefined}>{children}</main>{!tours && <Footer />}</ToursSessions.Provider>;
 }

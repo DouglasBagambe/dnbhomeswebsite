@@ -3,7 +3,7 @@ import { getProperties } from "@/lib/api";
 import { config } from "@/lib/config";
 import { propertyPath } from "@/lib/format";
 
-const staticPaths = ["", "/tours", "/buy", "/rent", "/short-stay", "/land", "/commercial", "/about", "/safety", "/help", "/contact", "/agents", "/agencies", "/privacy", "/terms", "/download"];
+const staticPaths = ["", "/reels", "/buy", "/rent", "/short-stay", "/land", "/commercial", "/about", "/safety", "/help", "/contact", "/agents", "/agencies", "/privacy", "/terms", "/download"];
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const first = await getProperties({ limit: 50, sort: "newest" }).catch(() => null);

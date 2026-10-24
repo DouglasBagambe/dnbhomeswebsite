@@ -1,2 +1,0 @@
-import { BrandLoading } from "@/components/brand-loading";
-export default function Loading() { return <div className="tours-loading"><BrandLoading label="Opening Tours" /></div>; }

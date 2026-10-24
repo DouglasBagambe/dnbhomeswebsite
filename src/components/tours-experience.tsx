@@ -18,7 +18,7 @@ export function ToursExperience({ initial, area, district, failed }: { initial: 
   const router = useRouter();
   const sessions = useToursSessions(), sessionKey = `${area}|${district}`;
   const [state, setState] = useState(() => { const saved = sessions?.get(sessionKey); return saved && Date.now() - saved.savedAt < 120000 ? saved : { ...initial, index: 0, mediaPositions: {} as Record<string, number>, muted: true, savedAt: 0 }; });
-  const [busy, setBusy] = useState(false), [error, setError] = useState(failed ? "Tours couldn’t load. Check your connection and try again." : "");
+  const [busy, setBusy] = useState(false), [error, setError] = useState(failed ? "Reels couldn’t load. Check your connection and try again." : "");
   const [muted, setMuted] = useState(state.muted), [covered, setCovered] = useState(false), [notice, setNotice] = useState("");
   const stage = useRef<HTMLElement>(null), dialog = useRef<HTMLDialogElement>(null), locationButton = useRef<HTMLButtonElement>(null);
   const request = useRef<AbortController | null>(null), fetching = useRef(false);
@@ -37,7 +37,7 @@ export function ToursExperience({ initial, area, district, failed }: { initial: 
     try {
       const params = new URLSearchParams({ page: String(state.nextPage), ...(area ? { area } : {}), ...(district ? { district } : {}) });
       const response = await fetch(`/api/tours?${params}`, { signal: controller.signal });
-      if (!response.ok) throw new Error("Tours unavailable");
+      if (!response.ok) throw new Error("Reels unavailable");
       const result = await response.json() as ToursPage;
       if (controller.signal.aborted) return;
       setState(previous => {
@@ -46,7 +46,7 @@ export function ToursExperience({ initial, area, district, failed }: { initial: 
         for (const item of result.locations) locations.set(`${item.area}|${item.district}`, item);
         return { ...previous, data: [...previous.data, ...tourProperties(result.data).filter(item => !seen.has(item._id) && Boolean(seen.add(item._id)))], nextPage: result.nextPage, locations: [...locations.values()] };
       });
-    } catch { if (request.current === controller) setError("Couldn’t load more tours. Check your connection and retry."); }
+    } catch { if (request.current === controller) setError("Couldn’t load more reels. Check your connection and retry."); }
     finally { clearTimeout(timeout); if (request.current === controller) { fetching.current = false; setBusy(false); } }
   }, [area, district, state.nextPage]);
   useEffect(() => () => { request.current?.abort(); request.current = null; }, []);
@@ -83,7 +83,7 @@ export function ToursExperience({ initial, area, district, failed }: { initial: 
     const params = new URLSearchParams({ ...(selected.area ? { area: selected.area } : {}), ...(selected.district ? { district: selected.district } : {}) });
     // Selecting the current location should also resume playback, without waiting for navigation.
     if (selected.area === area && selected.district === district) { setCovered(false); return; }
-    router.push(`/tours${params.size ? `?${params}` : ""}`);
+    router.push(`/reels${params.size ? `?${params}` : ""}`);
   }
   async function share() {
     if (!property) return; setCovered(true); setNotice("");
@@ -92,14 +92,14 @@ export function ToursExperience({ initial, area, district, failed }: { initial: 
     finally { setCovered(false); }
   }
   const label = property ? availabilityLabel(property) : undefined;
-  return <section className="tours-shell" aria-label="Property Tours">
-    <header className="tours-topbar"><div className="tours-identity"><Brand /><span className="tours-divider" /><h1>Tours</h1></div>
+  return <section className="tours-shell" aria-label="Property Reels">
+    <header className="tours-topbar"><div className="tours-identity"><Brand /><span className="tours-divider" /><h1>Reels</h1></div>
       <button ref={locationButton} className="tours-location" onClick={() => { setCovered(true); dialog.current?.showModal(); }}><MapPin size={17} /><span>{place}</span><ChevronRight size={15} /></button>
-      <Link className="tours-close" href="/discover" aria-label="Close Tours and discover homes" onClick={() => setCovered(true)}><X size={21} /><span>Close</span></Link>
+      <Link className="tours-close" href="/discover" aria-label="Close Reels and discover homes" onClick={() => setCovered(true)}><X size={21} /><span>Close</span></Link>
     </header>
     <div className="tour-workspace">
-      <aside className="tours-intro"><span className="eyebrow">A closer look</span><h2>Find a place.<br />Feel at home.</h2><p>Walk through real spaces, then explore the details that matter.</p><Link href="/discover"><ArrowLeft size={16} />Back to Discover</Link><div className="tours-key-guide"><span><kbd>↑</kbd><kbd>↓</kbd> Move between homes</span><span><kbd>←</kbd><kbd>→</kbd> Explore each home’s media</span><span>Scroll, swipe or use the arrows.</span></div></aside>
-      <article ref={stage} className="tour-stage" tabIndex={0} aria-label="Tour viewer" aria-describedby="tour-instructions"
+      <aside className="tours-intro"><span className="eyebrow">A closer look</span><h2>Find a place.<br />Feel at home.</h2><p>Watch property videos, then explore the details that matter.</p><Link href="/discover"><ArrowLeft size={16} />Back to Discover</Link><div className="tours-key-guide"><span><kbd>↑</kbd><kbd>↓</kbd> Move between homes</span><span><kbd>←</kbd><kbd>→</kbd> Explore each home’s media</span><span>Scroll, swipe or use the arrows.</span></div></aside>
+      <article ref={stage} className="tour-stage" tabIndex={0} aria-label="Reels viewer" aria-describedby="tour-instructions"
         onPointerDown={event => { if (covered || !event.isPrimary || event.clientX < 20 || event.clientX > innerWidth - 20 || (event.target as HTMLElement).closest("button:not(.tour-tap-surface),a,input,select")) return; pointer.current = { x: event.clientX, y: event.clientY }; }}
         onPointerMove={event => { const start = pointer.current; if (!start) return; const x = Math.abs(event.clientX - start.x), y = Math.abs(event.clientY - start.y); if (!start.axis && Math.max(x, y) > 12) start.axis = x > y * 1.2 ? "x" : y > x * 1.2 ? "y" : undefined; if (start.axis) { event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); } }}
         onPointerCancel={() => { pointer.current = null; }}
@@ -114,12 +114,12 @@ export function ToursExperience({ initial, area, district, failed }: { initial: 
           {media.length > 1 && <div className="tour-media-arrows"><button aria-label="Previous property media" disabled={mediaIndex === 0} onClick={() => mediaStep(-1)}><ChevronLeft /></button><button aria-label="Next property media" disabled={mediaIndex === media.length - 1} onClick={() => mediaStep(1)}><ChevronRight /></button></div>}
           <div className="tour-caption"><div className="tour-labels"><span>{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span>{label && <span className="tour-availability">{label}</span>}{property.verificationStatus === "verified" && <span>Verified</span>}</div><p className="tour-price">{formatPrice(property.price)}</p><h2>{property.title}</h2><p className="tour-place"><MapPin size={14} />{locationLabel(property)}</p><div className="tour-facts">{property.bedrooms ? <span><BedDouble size={15} />{property.bedrooms} beds</span> : null}{property.bathrooms ? <span><Bath size={15} />{property.bathrooms} baths</span> : null}</div><Link className="tour-details" href={href} onClick={() => setCovered(true)}>Explore this home<ChevronRight size={17} /></Link></div>
           <div className="tour-action-rail"><div><FavoriteButton id={property._id} /><span>Save</span></div><div><button onClick={() => void share()} aria-label="Share property"><Share2 size={20} /></button><span>Share</span></div></div>
-        </> : <div className="tour-empty"><Clapperboard size={32} /><h2>{busy ? "" : error ? "Let’s try that again." : state.data.length ? "You’re all caught up." : "A closer look is coming."}</h2>{busy ? <BrandLoading label="Finding property tours" /> : <><p>{error || (state.nextPage !== null ? "There may be more videos further in the collection." : state.data.length ? "Try another location, or return to a home you liked." : "No video tours here just yet. You can still explore homes in Discover.")}</p>{state.nextPage !== null && <button onClick={() => void more()}>{error ? "Try again" : "Continue exploring"}</button>}<Link href="/discover">Explore homes<ChevronRight size={16} /></Link></>}</div>}
-        <div className="tour-property-arrows"><button aria-label="Previous property tour" disabled={state.index === 0} onClick={() => propertyStep(-1)}><ArrowUp /></button><button aria-label="Next property tour" disabled={state.index >= state.data.length} onClick={() => propertyStep(1)}><ArrowDown /></button></div>
+        </> : <div className="tour-empty"><Clapperboard size={32} /><h2>{busy ? "" : error ? "Let’s try that again." : state.data.length ? "You’re all caught up." : "A closer look is coming."}</h2>{busy ? <BrandLoading label="Finding property videos" /> : <><p>{error || (state.nextPage !== null ? "There may be more videos further in the collection." : state.data.length ? "Try another location, or return to a home you liked." : "No property videos here just yet. You can still explore homes in Discover.")}</p>{state.nextPage !== null && <button onClick={() => void more()}>{error ? "Try again" : "Continue exploring"}</button>}<Link href="/discover">Explore homes<ChevronRight size={16} /></Link></>}</div>}
+        <div className="tour-property-arrows"><button aria-label="Previous property reel" disabled={state.index === 0} onClick={() => propertyStep(-1)}><ArrowUp /></button><button aria-label="Next property reel" disabled={state.index >= state.data.length} onClick={() => propertyStep(1)}><ArrowDown /></button></div>
         {property && error && <div className="tour-feed-error" role="status">{error}<button onClick={() => void more()}>Retry</button></div>}
         {notice && <p className="tour-notice" role="status">{notice}</p>}
       </article>
-      <aside className="tours-side-note"><Clapperboard size={23} /><p>A home has<br />more to show.</p><span>Videos first.<br />Photos a swipe away.</span><span className="tours-position" aria-live="polite">{property ? `Home ${state.index + 1}` : "Tours"}</span></aside>
+      <aside className="tours-side-note"><Clapperboard size={23} /><p>A home has<br />more to show.</p><span>Videos first.<br />Photos a swipe away.</span><span className="tours-position" aria-live="polite">{property ? `Home ${state.index + 1}` : "Reels"}</span></aside>
     </div>
     <dialog ref={dialog} className="tour-location-dialog" onCancel={event => { event.preventDefault(); closeLocation(); }} onClick={event => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeLocation(); } }} aria-labelledby="tour-location-title">
       <div className="tour-location-heading"><h2 id="tour-location-title">Where shall we explore?</h2><button aria-label="Close location selector" onClick={closeLocation}><X size={21} /></button></div>

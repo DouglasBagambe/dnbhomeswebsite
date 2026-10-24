@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
 for (const [width, height] of [[390, 844], [1440, 900]]) for (const theme of ["light", "dark"]) {
-  test(`Tours ${width} ${theme}: video, photos, save, location and return`, async ({ page }) => {
+  test(`Reels ${width} ${theme}: video, photos, save, location and return`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await page.addInitScript(t => localStorage.setItem("homes-theme", t), theme);
-    await page.goto("/tours");
-    const viewer = page.getByRole("article", { name: "Tour viewer" });
+    await page.goto("/reels");
+    const viewer = page.getByRole("article", { name: "Reels viewer" });
     await expect(viewer.locator("video")).toHaveCount(1);
     await expect.poll(() => viewer.locator("video").evaluate((v: HTMLVideoElement) => !v.paused && v.readyState >= 2)).toBe(true);
     expect(await viewer.locator("video").evaluate((v: HTMLVideoElement) => v.muted)).toBe(true);
@@ -30,8 +30,8 @@ for (const [width, height] of [[390, 844], [1440, 900]]) for (const theme of ["l
     await page.screenshot({ path: `test-results/v2-screenshots/tours-${width}-${theme}.png` });
   });
 }
-test("Tours: both keyboard axes, single player, background pause, video failure and retry", async ({ page }) => {
-  await page.goto("/tours"); const viewer = page.getByRole("article", { name: "Tour viewer" });
+test("Reels: both keyboard axes, single player, background pause, video failure and retry", async ({ page }) => {
+  await page.goto("/reels"); const viewer = page.getByRole("article", { name: "Reels viewer" });
   const first = await viewer.locator("h2").innerText();
   await page.keyboard.press("ArrowDown"); await expect(viewer.locator("h2")).not.toHaveText(first);
   await page.keyboard.press("ArrowUp"); await expect(viewer.locator("h2")).toHaveText(first);
@@ -47,18 +47,18 @@ test("Tours: both keyboard axes, single player, background pause, video failure 
   await page.getByRole("button", { name: "Retry video", exact: true }).click(); await expect(viewer.locator("video")).toHaveCount(1);
   await expect.poll(() => viewer.locator("video").evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
 });
-test("Tours respects reduced motion and keeps Discover Swipe as a separate mode", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" }); await page.goto("/tours");
+test("Reels respects reduced motion and keeps Discover Swipe as a separate mode", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" }); await page.goto("/reels");
   await expect.poll(() => page.locator(".tour-stage video").evaluate((v: HTMLVideoElement) => v.readyState >= 1)).toBe(true);
   expect(await page.locator(".tour-stage video").evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
   await page.getByRole("button", { name: "Play video", exact: true }).click(); await expect.poll(() => page.locator(".tour-stage video").evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true);
-  await page.getByRole("link", { name: "Close Tours and discover homes" }).click();
+  await page.getByRole("link", { name: "Close Reels and discover homes" }).click();
   await page.getByRole("button", { name: "Swipe", exact: true }).click(); await expect(page.locator(".swipe-stage")).toBeVisible();
   await expect(page.locator(".tour-stage")).toHaveCount(0);
 });
-test("Tours controls remain on screen at narrow and short viewport sizes", async ({ page }) => {
+test("Reels controls remain on screen at narrow and short viewport sizes", async ({ page }) => {
   for (const [width,height] of [[320,700],[844,390],[768,1024]]) {
-    await page.setViewportSize({width,height}); await page.goto("/tours");
+    await page.setViewportSize({width,height}); await page.goto("/reels");
     await expect(page.locator(".tour-playback")).toBeVisible();
     const bounds = await page.locator(".tour-playback").boundingBox();
     expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(height);
@@ -67,19 +67,26 @@ test("Tours controls remain on screen at narrow and short viewport sizes", async
     expect(save!.x + save!.width <= arrows!.x || arrows!.x + arrows!.width <= save!.x || save!.y + save!.height <= arrows!.y || arrows!.y + arrows!.height <= save!.y).toBe(true);
   }
 });
-test("Tours availability remains visible in compact landscape", async ({ page }) => {
-  await page.setViewportSize({width:844,height:390}); await page.goto('/tours?district=Kampala&area=Bukoto');
+test("Reels availability remains visible in compact landscape", async ({ page }) => {
+  await page.setViewportSize({width:844,height:390}); await page.goto('/reels?district=Kampala&area=Bukoto');
   await expect(page.locator('.tour-availability')).toHaveText('Rented'); await expect(page.locator('.tour-availability')).toBeVisible();
   await page.getByRole('link',{name:'Explore this home',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Viewings unavailable'})).toBeVisible();
   await expect(page.locator('form.viewing-form')).toHaveCount(0);
 });
-test("Tours API failure is recoverable without a permanent loading screen", async ({ page, request }) => {
+test("Reels API failure is recoverable without a permanent loading screen", async ({ page, request }) => {
   const healthy = await (await request.get('/api/tours')).json();
-  await page.goto('/tours?district=QA+outage');
+  await page.goto('/reels?district=QA+outage');
   await expect(page.getByRole('heading',{name:'Let’s try that again.'})).toBeVisible();
   await page.route('**/api/tours?*', route => route.fulfill({json:healthy}));
   await page.getByRole('button',{name:'Try again',exact:true}).click();
   await expect(page.locator('.tour-stage video')).toHaveCount(1);
   await expect(page.getByRole('heading',{name:'Let’s try that again.'})).toHaveCount(0);
+});
+
+test("Reels keeps old Tours links and location filters working", async ({ page }) => {
+  await page.goto("/tours?district=Kampala&area=Bukoto");
+  await expect(page).toHaveURL(/\/reels\?district=Kampala&area=Bukoto/);
+  await expect(page.getByRole("heading", { name: "Reels", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Bukoto, Kampala", exact: true })).toBeVisible();
 });
