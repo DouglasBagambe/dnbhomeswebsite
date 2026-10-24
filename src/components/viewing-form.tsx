@@ -6,7 +6,7 @@ import { BOOKINGS_KEY, type LocalBooking } from "@/lib/storage";
 import type { Booking } from "@/types/property";
 import { useConsumer } from "./consumer-provider";
 
-export function ViewingForm({ propertyId, propertyTitle }: { propertyId: string; propertyTitle: string }) {
+export function ViewingForm({ propertyId, propertyTitle, unavailableReason }: { propertyId: string; propertyTitle: string; unavailableReason?: string }) {
   const consumer = useConsumer();
   const idempotency = useRef<string | null>(null);
   const [state, setState] = useState<{ loading: boolean; error?: string; booking?: Booking }>({ loading: false });
@@ -35,6 +35,8 @@ export function ViewingForm({ propertyId, propertyTitle }: { propertyId: string;
       setState({ loading: false, error: error instanceof Error ? error.message : "Unable to send request" });
     }
   };
+
+  if (unavailableReason) return <div className="viewing-unavailable" role="status"><h2>Viewings unavailable</h2><p>This property is currently {unavailableReason.toLowerCase()}. New viewing requests are closed.</p><Link className="text-link" href="/discover">Explore other homes</Link></div>;
 
   if (state.booking) return <div role="status" className="viewing-success">
     <span className="badge">{state.booking.status}</span>

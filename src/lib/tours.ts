@@ -18,10 +18,6 @@ export function tourCover(property: Property): string | undefined {
   const cover = property.cover?.type === "image" ? property.cover : property.media.find(m => m.type === "image");
   return cover && safeTourUrl(cover.url) ? cover.url : undefined;
 }
-export function availabilityLabel(property: Property): string | undefined {
-  if (!property.availabilityStatus || property.availabilityStatus === "available") return undefined;
-  return ({ rented: "Rented", sold: "Sold", reserved: "Reserved", under_offer: "Under offer", unavailable: "Unavailable" } as Record<string, string>)[property.availabilityStatus] ?? "Unavailable";
-}
 
 export async function scanTours(fetchPage: (query: { page: number; limit: number; sort: "popular"; area?: string; district?: string }) => Promise<PropertyPage>, page: number, area: string, district: string): Promise<ToursPage> {
   const locations = new Map<string, { area: string; district: string }>();

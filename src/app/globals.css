@@ -919,3 +919,6 @@ body:has(.is-swipe) .filters.open { z-index:70; }
 .tour-stage { user-select:none; -webkit-user-select:none; }
 
 @media (max-height:560px) and (min-width:701px) { .tour-labels{display:flex;margin-bottom:4px}.tour-labels span:not(.tour-availability){display:none} }
+
+.availability-mark { display:inline-flex; padding:5px 10px; margin:0 8px 8px 0; border:1px solid var(--border-strong); border-radius:6px; background:var(--surface-warm); color:var(--ink); font-size:.75rem; font-weight:600; }
+.viewing-unavailable { padding-block:20px; }.viewing-unavailable h2{font-size:1.2rem}.viewing-unavailable p{font-size:.87rem;color:var(--muted)}

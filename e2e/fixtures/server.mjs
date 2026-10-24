@@ -31,7 +31,7 @@ http.createServer(async(req,res)=>{
   const total=data.length,limit=Number(u.searchParams.get('limit')||20),page=Number(u.searchParams.get('page')||1);
   return send({data:data.slice((page-1)*limit,page*limit),pagination:{page,limit,total,pages:Math.ceil(total/limit)}});
  }
- if(u.pathname.startsWith('/api/v1/properties/')){const p=[...properties,heavy,failed].find(p=>p._id===u.pathname.split('/').at(-1));return p?send({data:p}):send({error:{message:'Property not found'}},404);}
+ if(u.pathname.startsWith('/api/v1/properties/')){const p=[...properties,heavy,failed].find(p=>p._id===u.pathname.split('/').at(-1));return p?send({data:{...p,availabilityStatus:tourHomes.find(t=>t._id===p._id)?.availabilityStatus}}):send({error:{message:'Property not found'}},404);}
  if(u.pathname==='/api/v1/agents'||u.pathname==='/api/v1/agencies')return send({data:[],pagination:{page:1,limit:50,total:0,pages:0}});
  send({error:{message:'Unknown fixture route'}},404);
 }).listen(3100,'127.0.0.1',()=>console.log('Isolated visual QA API on 127.0.0.1:3100'));

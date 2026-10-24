@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandLoading } from "./brand-loading";
+import { availabilityLabel } from "@/lib/availability";
 import Link from "next/link";
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -179,18 +180,18 @@ export function DiscoverExperience({ result, queryKey }: { result: PropertyPage;
           {current?.type === "video" ? <SwipeVideo key={`${property._id}:${current.url}`} media={current} poster={imageFor(property)} playerRef={video} />
             : current ? <PropertyImage key={current.url} src={current.url} alt={current.alt || property.title} fill sizes="(min-width: 1024px) 65vw, 100vw" priority />
               : <div className="swipe-placeholder" role="img" aria-label="Property media unavailable">More to discover in person</div>}
-          <div className="swipe-media-heading"><span>{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span><span aria-live="polite">{media.length ? `${mediaIndex + 1} / ${media.length}` : "No media"}</span></div>
+          <div className="swipe-media-heading"><span>{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}{availabilityLabel(property) ? ` · ${availabilityLabel(property)}` : ""}</span><span aria-live="polite">{media.length ? `${mediaIndex + 1} / ${media.length}` : "No media"}</span></div>
           {media.length > 1 && <div className="swipe-media-navigation"><button aria-label="Previous media" disabled={mediaIndex === 0} onClick={() => mediaStep(-1)}><ChevronLeft /></button><button aria-label="Next media" disabled={mediaIndex === media.length - 1} onClick={() => mediaStep(1)}><ChevronRight /></button></div>}
         </div>
         <div className="swipe-information">
           <div className="swipe-copy"><span className="eyebrow">Your next place</span><p className="swipe-price">{formatPrice(property.price)}</p><h2>{property.title}</h2><p className="swipe-location"><MapPin size={16} />{locationLabel(property)}</p><p className="swipe-facts">{[property.bedrooms ? `${property.bedrooms} beds` : "", property.bathrooms ? `${property.bathrooms} baths` : "", property.size ? `${property.size} ${property.sizeUnit}` : ""].filter(Boolean).join(" · ") || property.type.replaceAll("_", " ")}{property.verificationStatus === "verified" && <span> · Verified</span>}</p></div>
           <div className="swipe-actions" onClickCapture={pause}><FavoriteButton id={property._id} /><CompareButton property={property} /><ShareButton url={typeof window === "undefined" ? href : `${window.location.origin}${href}`} title={property.title} /></div>
-          <div className="swipe-primary-actions" onClickCapture={pause}><OpenComparisonButton /><Link className="button secondary" href={href} onClick={pause}>View details</Link><button className="button" onClick={() => { pause(); viewing.current?.showModal(); }}>Request viewing</button></div>
+          <div className="swipe-primary-actions" onClickCapture={pause}><OpenComparisonButton /><Link className="button secondary" href={href} onClick={pause}>View details</Link><button className="button" disabled={Boolean(availabilityLabel(property))} onClick={() => { pause(); viewing.current?.showModal(); }}>{availabilityLabel(property) ? `${availabilityLabel(property)} · Viewings closed` : "Request viewing"}</button></div>
           <div className="swipe-property-navigation"><button className="button secondary" aria-label="Previous property" disabled={position.property === 0} onClick={() => propertyStep(-1)}><ArrowUp size={18} />Previous</button>{position.property < items.length - 1 ? <button className="button secondary" aria-label="Next property" onClick={() => propertyStep(1)}>Next<ArrowDown size={18} /></button> : pagination.page < pagination.pages ? <button className="button secondary" onClick={more} disabled={loading}>{loading ? <BrandLoading inline label="Loading more homes" /> : "More homes"}</button> : <span>Last home in these results</span>}</div>
           {error && <p role="alert">{error}</p>}
         </div>
       </article>
-      <dialog ref={viewing} className="swipe-viewing-dialog" onClose={() => stage.current?.focus()}><button className="header-icon" aria-label="Close viewing request" onClick={() => viewing.current?.close()}><X /></button><ViewingForm key={property._id} propertyId={property._id} propertyTitle={property.title} /></dialog>
+      <dialog ref={viewing} className="swipe-viewing-dialog" onClose={() => stage.current?.focus()}><button className="header-icon" aria-label="Close viewing request" onClick={() => viewing.current?.close()}><X /></button><ViewingForm key={property._id} propertyId={property._id} propertyTitle={property.title} unavailableReason={availabilityLabel(property)} /></dialog>
     </>}
   </div>;
 }

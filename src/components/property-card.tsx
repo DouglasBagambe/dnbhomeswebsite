@@ -1,3 +1,4 @@
+import { availabilityLabel } from "@/lib/availability";
 import { PropertyImage } from "@/components/property-image";
 import Link from "next/link";
 import { CompareButton } from "@/components/compare-provider";
@@ -8,13 +9,14 @@ import type { Property } from "@/types/property";
 import { BadgeCheck } from "lucide-react";
 
 export function PropertyCard({ property, compact = false }: { property: Property; compact?: boolean }) {
+  const availability = availabilityLabel(property);
   const image = imageFor(property);
   const facts = [property.bedrooms ? `${property.bedrooms} beds` : "", property.bathrooms ? `${property.bathrooms} baths` : "", property.size ? `${property.size} ${property.sizeUnit}` : ""].filter(Boolean).join(" · ");
   return <article className={`property-card ${compact ? "compact" : ""}`}>
     <FavoriteButton id={property._id} />
     <Link className="property-image" href={propertyPath(property)} aria-label={`View ${property.title}`}>
       {image ? <PropertyImage key={image} src={image} alt={property.cover?.alt || property.title} fill sizes="(max-width: 620px) 100vw, (max-width: 1180px) 50vw, 25vw" /> : <div className="image-placeholder">Homes property</div>}
-      <span className="purpose-badge">{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span>
+      <span className="purpose-badge">{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}{availability ? ` · ${availability}` : ""}</span>
     </Link>
     <div className="property-body">
       <div className="property-price-row"><strong className="price">{formatPrice(property.price)}</strong></div>

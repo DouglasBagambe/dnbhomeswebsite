@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { availabilityLabel, safeTourUrl, scanTours, tourMedia, tourProperties } from "../src/lib/tours";
+import { availabilityLabel } from "../src/lib/availability";
+import { safeTourUrl, scanTours, tourMedia, tourProperties } from "../src/lib/tours";
 import type { Property, PropertyPage } from "../src/types/property";
 const photo = { type: "image" as const, url: "https://media.homes.ug/photo.jpg" };
 const video = { type: "video" as const, url: "https://media.homes.ug/video.mp4" };

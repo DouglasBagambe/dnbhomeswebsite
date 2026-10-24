@@ -9,7 +9,8 @@ import { FavoriteButton } from "./favorite-button";
 import { PropertyImage } from "./property-image";
 import { TourPlayer } from "./tour-player";
 import { useToursSessions } from "./site-frame";
-import { availabilityLabel, tourCover, tourMedia, tourProperties, type TourPlace, type ToursPage } from "@/lib/tours";
+import { availabilityLabel } from "@/lib/availability";
+import { tourCover, tourMedia, tourProperties, type TourPlace, type ToursPage } from "@/lib/tours";
 import { formatPrice, locationLabel } from "@/lib/format";
 import { config } from "@/lib/config";
 

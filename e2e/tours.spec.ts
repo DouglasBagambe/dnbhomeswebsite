@@ -70,6 +70,9 @@ test("Tours controls remain on screen at narrow and short viewport sizes", async
 test("Tours availability remains visible in compact landscape", async ({ page }) => {
   await page.setViewportSize({width:844,height:390}); await page.goto('/tours?district=Kampala&area=Bukoto');
   await expect(page.locator('.tour-availability')).toHaveText('Rented'); await expect(page.locator('.tour-availability')).toBeVisible();
+  await page.getByRole('link',{name:'Explore this home',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Viewings unavailable'})).toBeVisible();
+  await expect(page.locator('form.viewing-form')).toHaveCount(0);
 });
 test("Tours API failure is recoverable without a permanent loading screen", async ({ page, request }) => {
   const healthy = await (await request.get('/api/tours')).json();

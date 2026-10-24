@@ -1,3 +1,4 @@
+import { availabilityLabel } from "@/lib/availability";
 import { RecentProperty } from "@/components/recent-property";
 import type { Metadata } from "next";
 import { PropertyGallery } from "@/components/property-gallery";
@@ -19,6 +20,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function PropertyPage({ params }: { params: Params }) {
   let property; try { property = await getProperty(idFromSlugAndId((await params).slugAndId)); } catch (error) { if (error instanceof ApiError && error.status === 404) notFound(); throw error; }
+  const availability = availabilityLabel(property);
   const images = property.media.filter((media) => media.type === "image" && media.url);
   if (property.cover?.url && !images.some((item) => item.url === property.cover?.url)) images.unshift(property.cover);
   const gallery = images.slice(0, 5);
@@ -38,7 +40,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
   return <><RecentProperty id={property._id} />
     <section className="section-tight property-detail"><div className="container">
       <nav aria-label="Breadcrumb" className="detail-breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/discover">Discover</Link><span>/</span><span>{property.location.area || property.title}</span></nav>
-      <div className="detail-heading"><div>{property.verificationStatus === "verified" && <span className="verified-mark"><ShieldCheck size={16} /> Verified listing</span>}<h1>{property.title}</h1><p><MapPin size={16} /> {locationLabel(property) || property.location.address}</p></div><div className="detail-actions"><div className="detail-favorite"><FavoriteButton id={property._id} /></div><ShareButton url={canonical} title={property.title} /></div></div>
+      <div className="detail-heading"><div>{availability && <span className="availability-mark">{availability}</span>}{property.verificationStatus === "verified" && <span className="verified-mark"><ShieldCheck size={16} /> Verified listing</span>}<h1>{property.title}</h1><p><MapPin size={16} /> {locationLabel(property) || property.location.address}</p></div><div className="detail-actions"><div className="detail-favorite"><FavoriteButton id={property._id} /></div><ShareButton url={canonical} title={property.title} /></div></div>
       <PropertyGallery media={media} title={property.title} />
       <div className="detail-layout"><article className="detail-copy">
         <div className="detail-price-mobile">{formatPrice(property.price)}</div>
@@ -49,10 +51,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
         {contact && <div className="agent-panel"><span className="eyebrow">Property representative</span><h2>{contact.name}</h2>{contact.verificationStatus === "verified" && <span className="verified-mark"><ShieldCheck size={16} /> Verified representative</span>}<p className="muted">{property.agent?.agency?.name ?? property.agency?.name}</p></div>}
         <div className="safety-note"><ShieldCheck size={22} /><div><strong>Stay safe while searching</strong><p>Independently verify the property and representative before sending money.</p><Link className="text-link" href="/safety">Read property safety guidance</Link></div></div>
         <CompareButton property={property} />
-      </article><aside className="booking-panel card" id="request-viewing"><div className="booking-price">{formatPrice(property.price)}</div><span className="muted">{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span><ViewingForm propertyId={property._id} propertyTitle={property.title} />{property.agent?.phone && <a className="button secondary contact-button" href={`tel:${property.agent.phone}`}>Call representative</a>}{property.agent?.whatsapp && <a className="button secondary contact-button" href={`https://wa.me/${property.agent.whatsapp.replace(/\D/g, "")}`} rel="noreferrer">WhatsApp</a>}</aside></div>
+      </article><aside className="booking-panel card" id="request-viewing"><div className="booking-price">{formatPrice(property.price)}</div><span className="muted">{property.purpose === "sale" ? "For sale" : property.purpose === "short_stay" ? "Short stay" : "For rent"}</span><ViewingForm propertyId={property._id} propertyTitle={property.title} unavailableReason={availability} />{property.agent?.phone && <a className="button secondary contact-button" href={`tel:${property.agent.phone}`}>Call representative</a>}{property.agent?.whatsapp && <a className="button secondary contact-button" href={`https://wa.me/${property.agent.whatsapp.replace(/\D/g, "")}`} rel="noreferrer">WhatsApp</a>}</aside></div>
     </div></section>
     {similar && similar.data.filter((item) => item._id !== property._id).length > 0 && <section className="section"><div className="container"><div className="section-heading"><h2>Similar properties</h2></div><PropertyGrid properties={similar.data.filter((item) => item._id !== property._id).slice(0, 4)} /></div></section>}
-    <div className="mobile-viewing-action"><strong>{formatPrice(property.price)}</strong><a className="button" href="#request-viewing">Request a viewing</a></div>
+    <div className="mobile-viewing-action"><strong>{formatPrice(property.price)}</strong>{availability ? <span className="availability-mark">{availability} · Viewings unavailable</span> : <a className="button" href="#request-viewing">Request a viewing</a>}</div>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listingJson).replaceAll("<", "\\u003c") }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs).replaceAll("<", "\\u003c") }} />
   </>;
 }
