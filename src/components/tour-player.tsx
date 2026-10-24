@@ -43,11 +43,11 @@ export function TourPlayer({ media, poster, active, muted, onMute }: { media: Me
   }
   return <div className="tour-video">
     {failed ? <div className="tour-media-state" role="status"><p>This video couldn’t load.</p><button onClick={() => { setFailed(false); setBusy(true); setAttempt(n => n + 1); }}>Retry video</button></div> : <>
-      <video key={attempt} ref={player} src={media.url} poster={poster} muted={muted} playsInline loop preload="metadata" aria-label={media.alt || "Property tour video"}
+      <video key={attempt} ref={player} src={media.url} poster={poster} muted={muted} playsInline loop preload="metadata" aria-label={media.alt || "Property video"}
         onLoadedMetadata={event => { setBusy(false); setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0); }}
         onTimeUpdate={event => setPosition(event.currentTarget.currentTime)} onPlaying={() => { setBusy(false); setPaused(false); }} onPause={() => setPaused(true)} onWaiting={() => setBusy(true)} onCanPlay={() => setBusy(false)} onError={() => { setFailed(true); setBusy(false); }} />
-      <button className="tour-tap-surface" aria-label={paused ? "Play tour video" : "Pause tour video"} onClick={toggle}>{paused && !busy && <span><Play fill="currentColor" size={30} /></span>}</button>
-      {busy && <div className="tour-buffering"><BrandLoading label="Loading tour video" /></div>}
+      <button className="tour-tap-surface" aria-label={paused ? "Play property video" : "Pause property video"} onClick={toggle}>{paused && !busy && <span><Play fill="currentColor" size={30} /></span>}</button>
+      {busy && <div className="tour-buffering"><BrandLoading label="Loading property video" /></div>}
       <div className="tour-playback">
         <button onClick={toggle} aria-label={paused ? "Play video" : "Pause video"}>{paused ? <Play size={19} /> : <Pause size={19} />}</button>
         <input aria-label="Video position" type="range" min="0" max={duration || 1} step="0.1" value={Math.min(position, duration || 0)} disabled={!duration} onChange={event => { if (player.current) { const value = Number(event.target.value); player.current.currentTime = value; setPosition(value); } }} />
