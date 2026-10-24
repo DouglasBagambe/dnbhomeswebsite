@@ -3,7 +3,7 @@ import { Brand } from "@/components/brand";
 import { ThemeControl } from "@/components/theme-control";
 
 const groups = [
-  { title: "Find a Home", links: [["Buy", "/buy"], ["Rent", "/rent"], ["Short Stay", "/short-stay"], ["Land", "/land"], ["Commercial", "/commercial"]] },
+  { title: "Find a Home", links: [["Buy", "/buy"], ["Rent", "/rent"], ["Short Stay", "/short-stay"], ["Land", "/land"], ["Commercial", "/commercial"], ["Tours", "/tours"]] },
   { title: "Homes", links: [["About", "/about"], ["Locations", "/locations/uganda"], ["Safety", "/safety"], ["Mobile app", "/download"]] },
   { title: "Support", links: [["Help Centre", "/help"], ["Contact", "/contact"], ["Bookings", "/bookings"]] },
 ] as const;

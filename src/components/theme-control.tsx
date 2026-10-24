@@ -30,7 +30,7 @@ function applyTheme(theme: Theme) {
   root.style.colorScheme = resolved;
 }
 
-export function ThemeControl() {
+export function ThemeSync() {
   const theme = useSyncExternalStore(subscribeTheme, readTheme, serverTheme);
   useEffect(() => {
     applyTheme(theme);
@@ -39,6 +39,11 @@ export function ThemeControl() {
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, [theme]);
+  return null;
+}
+
+export function ThemeControl() {
+  const theme = useSyncExternalStore(subscribeTheme, readTheme, serverTheme);
   const choose = (next: Theme) => { localStorage.setItem("homes-theme", next); applyTheme(next); window.dispatchEvent(new Event(themeEvent)); };
   return <div className="theme-setting"><span>Theme</span><div className="theme-control" role="group" aria-label="Colour theme">
     {options.map(([value, Icon, label]) => <button key={value} type="button" className={theme === value ? "active" : ""} aria-pressed={theme === value} onClick={() => choose(value)}><Icon size={15} /><span>{label}</span></button>)}

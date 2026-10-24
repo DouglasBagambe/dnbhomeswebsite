@@ -74,6 +74,7 @@ export interface Property {
   agency?: Agency;
   featured: boolean;
   verificationStatus: "unverified" | "pending" | "verified" | "rejected";
+  availabilityStatus?: "available" | "reserved" | "under_offer" | "rented" | "sold" | "unavailable";
   status: "published";
   publishedAt?: string;
   updatedAt?: string;

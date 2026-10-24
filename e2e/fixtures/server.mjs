@@ -10,6 +10,7 @@ const properties=Array.from({length:8},(_,i)=>({
 const heavy = {...properties[0], _id: '6aca1225ca3d4ce6f2209da4', slug: 'media-heavy-qa', title: 'Media-rich family home QA — Kira', verificationStatus: 'unverified', tags: ['qa:media-heavy','preview'],
   media: [...Array.from({length:20},(_,i)=>({type:'image',url:`/images/${photos[i%photos.length]}.jpg`,alt:`QA image ${i+1}`})), ...Array.from({length:5},(_,i)=>({type:'video',url:`/qa/video-${i+1}.mp4`,alt:`Synthetic QA video ${i+1}`}))]};
 const failed = {...properties[0], _id:'507f1f77bcf86cd799439081',slug:'failed-image-qa',title:'Failed image QA',cover:{type:'image',url:'/qa/intentional-missing.jpg',alt:'Long descriptive alternative text must not overflow'},media:[{type:'image',url:'/qa/intentional-missing.jpg',alt:'Failed photo'},properties[0].media[1]]};
+const tourHomes = properties.slice(0,3).map((p,i)=>({...p,availabilityStatus:i===1?'rented':'available',media:[{type:'video',url:'/qa/video-1.mp4',alt:'Property walkthrough'},...(i===0?[{type:'video',url:'/qa/video-2.mp4',alt:'Second walkthrough'}]:[]),...p.media.slice(0,2)]}));
 let writes=[];
 http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://127.0.0.1:3100');res.setHeader('Content-Type','application/json');res.setHeader('Access-Control-Allow-Origin','http://127.0.0.1:3101');res.setHeader('Access-Control-Allow-Headers','Content-Type,Idempotency-Key');
@@ -22,7 +23,8 @@ http.createServer(async(req,res)=>{
   return send({data:{id:'local-inquiry'},message:'Your test message has been received.'},201);
  }
  if(u.pathname==='/api/v1/properties'){
-  let data=(u.searchParams.get('q')==='failed-image'?[failed]:u.searchParams.get('q')==='media-heavy'?[heavy,...properties]:u.searchParams.get('q')==='video-only'?[{...heavy,media:heavy.media.filter(m=>m.type==='video')}]:properties).filter(p=>['purpose','type','area','district'].every(k=>!u.searchParams.get(k)||(p[k]??p.location[k])===u.searchParams.get(k)));
+  if(u.searchParams.get('district')==='QA outage')return send({error:{message:'Isolated QA outage'}},503);
+  let data=(u.searchParams.get('sort')==='popular'&&u.searchParams.get('limit')==='50'?[...tourHomes,...properties.slice(3)]:u.searchParams.get('q')==='failed-image'?[failed]:u.searchParams.get('q')==='media-heavy'?[heavy,...properties]:u.searchParams.get('q')==='video-only'?[{...heavy,media:heavy.media.filter(m=>m.type==='video')}]:properties).filter(p=>['purpose','type','area','district'].every(k=>!u.searchParams.get(k)||(p[k]??p.location[k])===u.searchParams.get(k)));
   if(u.searchParams.get('q')==='empty')data=[];
   if(u.searchParams.get('verified')==='true')data=data.filter(p=>p.verificationStatus==='verified');
   const sort=u.searchParams.get('sort');if(sort==='price_asc'||sort==='price_desc')data.sort((a,b)=>(a.price.amount-b.price.amount)*(sort==='price_asc'?1:-1));
