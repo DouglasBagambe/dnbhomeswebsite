@@ -1,4 +1,5 @@
 "use client";
+import { BrandLoading } from "./brand-loading";
 import Link from "next/link";
 import { config } from "@/lib/config";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -85,9 +86,7 @@ export function AccountPanel() {
 
   if (!account || account.loading) {
     return <section className="account-panel account-state" aria-live="polite">
-      <span className="eyebrow">Your Homes</span>
-      <h1>Getting things ready.</h1>
-      <p className="muted">Restoring your account and saved homes securely.</p>
+      <BrandLoading label="Restoring your account and saved homes" />
     </section>;
   }
 
@@ -239,7 +238,7 @@ export function AccountPanel() {
         {["register", "signin", "reset"].includes(mode) && <div className="field"><label htmlFor="account-password">{mode === "reset" ? "New password" : "Password"}</label><input id="account-password" name="password" type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} minLength={mode === "signin" ? 1 : 12} maxLength={128} required />{mode !== "signin" && <span className="muted">Use at least 12 characters. A memorable passphrase works well.</span>}</div>}
         {mode === "verify" && <div className="field"><label htmlFor="verification-email">Email</label><input id="verification-email" name="email" type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required maxLength={254} /></div>}
         {["verify", "reset"].includes(mode) && <><p className="muted">Enter the six-digit code sent to {email}. It expires in 10 minutes.</p><div className="field"><label htmlFor="account-code">Six-digit code</label><input id="account-code" name="otp" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required /></div></>}
-        <button className="button" disabled={busy}>{busy ? "Please wait…" : ({ register: "Create account", signin: "Sign in", verify: "Verify email", forgot: "Send reset code", reset: "Update password", welcome: "Continue" })[mode]}</button>
+        <button className="button" disabled={busy}>{busy ? <BrandLoading inline label="Processing your account request" /> : ({ register: "Create account", signin: "Sign in", verify: "Verify email", forgot: "Send reset code", reset: "Update password", welcome: "Continue" })[mode]}</button>
       </form>
       <div className="account-shortcuts">
         {mode === "signin" && <><button className="text-link" onClick={() => changeMode("forgot")}>Forgot password?</button><button className="text-link" onClick={() => { changeMode("verify"); }}>Verify your email</button></>}
